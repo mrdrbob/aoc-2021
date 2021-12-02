@@ -13,3 +13,7 @@ This could be written as a one-liner using tuples, but I created a small `Accumu
 ## Day 1 - Part 2
 
 This was largely a matter of applying a rolling queue to the values and yielding the sum of the queue when it was full. I wrapped this logic up into an extension method that I could then just drop in the LINQ chain.
+
+## Day 2 - Part 1
+
+This one is mostly a matter of following instructions and maintaining state correctly. Once again, I leaned on my old pal `Aggregate` to do a lot of the work for me. I also leaned on a couple simple record types to make things more clear / explicit. Also, the `with` syntax is a pretty slick way of working with immutable data. A bit overkill here, though.
