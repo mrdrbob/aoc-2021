@@ -8,9 +8,9 @@
                 var instruction = Instruction.FromString(line);
                 switch (instruction.Direction)
                 {
-                    case "forward": return acc with { Horizontal = acc.Horizontal + instruction.Distance };
-                    case "down": return acc with { Depth = acc.Depth + instruction.Distance };
-                    case "up": return acc with { Depth = acc.Depth - instruction.Distance };
+                    case "forward": return acc with { Horizontal = acc.Horizontal + instruction.Distance, Depth = acc.Depth + (acc.Aim * instruction.Distance) };
+                    case "down": return acc with { Aim = acc.Aim + instruction.Distance };
+                    case "up": return acc with { Aim = acc.Aim - instruction.Distance };
                     default: throw new NotImplementedException();
                 }
             });
@@ -27,6 +27,6 @@
             }
         }
 
-        public record struct Position(int Horizontal, int Depth);
+        public record struct Position(int Horizontal, int Depth, int Aim);
     }
 }
