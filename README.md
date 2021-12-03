@@ -33,6 +33,7 @@ Also, if you're not familiar with bitwise operations, you may find the Epsilon c
 For example:
 
 | value           | representation in binary         | Description                                                                                               |
+| --------------- | -------------------------------- | --------------------------------------------------------------------------------------------------------- |
 | gamma           | 00000000000000000000000100101001 | An example gamma value                                                                                    |
 | ~gamma          | 11111111111111111111111011010110 | Gamma, but inverted                                                                                       |
 | 0X0FFF          | 00000000000000000000111111111111 | A mask where only the 12 right-most bits are set                                                          |
