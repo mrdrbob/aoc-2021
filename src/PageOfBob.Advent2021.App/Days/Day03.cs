@@ -6,7 +6,10 @@
 
         public static void Execute()
         {
-            var bitList = Utilities.GetEmbeddedData("03").Lines().AsBits();
+            var bitList = Utilities.GetEmbeddedData("03").Lines().AsBits().ToList();
+
+            // Part 1:
+            /*
             var positionCounts = new Dictionary<int, BitCount>();
             foreach (var bits in bitList)
             {
@@ -16,7 +19,6 @@
                     positionCounts[x] = bitCount.Add(bits[x]);
                 }
             }
-
             var gamma = Enumerable.Range(0, BitLength).Aggregate(0u, (output, position) => positionCounts[position].MostCommonBit ? output.WithBitSetAtPosition(position) : output);
             
             // Invert and mask off only the left-most 12 bits
@@ -24,7 +26,36 @@
 
             var output = gamma * epislon;
             Console.WriteLine(output);
+            */
+
+            // Part 2:
+            var o2Rating = FilterBits(bitList, 0, (t, count) => t == (count.On >= count.Off)).ToUint();
+            var co2Rating = FilterBits(bitList, 0, (t, count) => t == !(count.On >= count.Off)).ToUint();
+            Console.WriteLine(o2Rating);
+            Console.WriteLine(co2Rating);
+            Console.WriteLine(o2Rating * co2Rating);
         }
+
+        private static uint ToUint(this bool[] value)
+            => Enumerable.Range(0, BitLength).Aggregate(0u, (output, position) => value[position] ? output.WithBitSetAtPosition(position) : output);
+
+        private static bool[] FilterBits(IEnumerable<bool[]> lines, int position, Func<bool, BitCount, bool> filterCriteria)
+        {
+            var bitCount = lines.GetBitCount(position);
+            var newList = lines.Where(line => filterCriteria(line[position], bitCount)).ToList();
+
+            if (newList.Count == 1)
+                return newList[0];
+            else if (newList.Count == 0)
+                throw new NotImplementedException();
+            else if (position + 1 >= BitLength)
+                throw new NotImplementedException();
+            else
+                return FilterBits(newList, position + 1, filterCriteria);
+        }
+
+        public static BitCount GetBitCount(this IEnumerable<bool[]> list, int position)
+            => list.Aggregate(new BitCount(), (acc, line) => acc.Add(line[position]));
 
         public static uint WithBitSetAtPosition(this uint value, int position)
             => value | (1u << (BitLength - position - 1));
