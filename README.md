@@ -70,3 +70,9 @@ If you said "That will execute the LINQ statement every time you run it and give
 `var cards = lines.Skip(1).Select(BingoCard.FromString).ToList();`
 
 Lazy LINQ evaluation strikes again!
+
+## Day 4 - Part 2
+
+Instead of returning the first winning card, I need to return the last. Again, lots of ways to do this and I chose what I *think* was the laziest.
+
+I rewrote my method of finding the first winning card to `yield return` every card that wins (keeping track of previous winning cards so as not to return them a second time). Then I just grab the `.Last()` one.

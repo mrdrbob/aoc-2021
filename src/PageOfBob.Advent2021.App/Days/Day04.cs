@@ -11,10 +11,15 @@ namespace PageOfBob.Advent2021.App.Days
 
             var cards = lines.Skip(1).Select(BingoCard.FromString).ToList();
 
+            /* Part 1
             var (winner, winningPick) = FindWinner(picks, cards) ?? throw new NotImplementedException();
             var sum = winner.SumOfAllUnmarked();
             Console.WriteLine(sum * winningPick);
+            */
 
+            var (lastWinner, lastPick) = FindAllWinners(picks, cards).Last();
+            var sum = lastWinner.SumOfAllUnmarked();
+            Console.WriteLine(sum * lastPick);
         }
 
         private static (BingoCard, int)? FindWinner(IEnumerable<int> picks, IEnumerable<BingoCard> cards)
@@ -30,6 +35,24 @@ namespace PageOfBob.Advent2021.App.Days
             }
 
             return null;
+        }
+
+        private static IEnumerable<(BingoCard, int)> FindAllWinners(IEnumerable<int> picks, IEnumerable<BingoCard> cards)
+        {
+            var alreadyWon = new HashSet<BingoCard>();
+            foreach (var pick in picks)
+            {
+                foreach (var card in cards.Where(x => !alreadyWon.Contains(x)))
+                {
+                    card.Add(pick);
+                    if (card.AnyWins())
+                    {
+                        yield return (card, pick);
+                        alreadyWon.Add(card);
+                    }
+                }
+            }
+
         }
 
         public class BingoCard
