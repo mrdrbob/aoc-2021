@@ -76,3 +76,23 @@ Lazy LINQ evaluation strikes again!
 Instead of returning the first winning card, I need to return the last. Again, lots of ways to do this and I chose what I *think* was the laziest.
 
 I rewrote my method of finding the first winning card to `yield return` every card that wins (keeping track of previous winning cards so as not to return them a second time). Then I just grab the `.Last()` one.
+
+## Day 5 - Part 1
+
+This one is largely a matter of "calculating" lines, and then tracking how many times any given point is crossed. The tricky part is largely getting all the details right. For example:
+
+```csharp
+    var x = Start.X;
+    return Utilities.RangeFromTo(Start.Y, End.Y).Select(y => new Position(x, y));
+```
+
+It's tempting to use `Enumerable.Range` here, but `Enumerable.Range` accepts a starting number and a *count*. I added a simple utility to create a range from a starting point and an ending point, specifically going from the smaller number to the larger number.
+
+```csharp
+    public static IEnumerable<int> RangeFromTo(int start, int end)
+    {
+        int rangeStart = Math.Min(start, end);
+        int rangeEnd = Math.Max(start, end);
+        return Enumerable.Range(rangeStart, rangeEnd - rangeStart + 1);
+    }
+```

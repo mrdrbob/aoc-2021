@@ -23,5 +23,19 @@
 
         public static IEnumerable<int> AsNumbers(this IEnumerable<string> lines)
             => lines.Select(int.Parse);
+
+        public static void Deconstruct<T>(this T[] split, out T first, out T second)
+        {
+            first = split[0];
+            second = split[1];
+        }
+
+        public static IEnumerable<int> RangeFromTo(int start, int end)
+        {
+            int rangeStart = Math.Min(start, end);
+            int rangeEnd = Math.Max(start, end);
+            return Enumerable.Range(rangeStart, rangeEnd - rangeStart + 1);
+        }
+            
     }
 }
