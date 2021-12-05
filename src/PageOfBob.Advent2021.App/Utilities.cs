@@ -32,9 +32,15 @@
 
         public static IEnumerable<int> RangeFromTo(int start, int end)
         {
-            int rangeStart = Math.Min(start, end);
-            int rangeEnd = Math.Max(start, end);
-            return Enumerable.Range(rangeStart, rangeEnd - rangeStart + 1);
+            int step = start > end ? -1 : 1;
+            int pos = start;
+            while (pos != end)
+            {
+                yield return pos;
+                pos += step;
+            }
+
+            yield return pos;
         }
             
     }

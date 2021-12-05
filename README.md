@@ -96,3 +96,32 @@ It's tempting to use `Enumerable.Range` here, but `Enumerable.Range` accepts a s
         return Enumerable.Range(rangeStart, rangeEnd - rangeStart + 1);
     }
 ```
+
+## Day 5 - Part 2
+
+The diagonal lines poked at a flaw in my `RangeFromTo` method. With a completely horizontal or vertical line, it doesn't matter which direction you iterate the points. With a diagonal, you need to iterate the X and Y in a consistent direction with respect to the start/end points. So I rewrote the method:
+
+```csharp
+        public static IEnumerable<int> RangeFromTo(int start, int end)
+        {
+            int step = start > end ? -1 : 1;
+            int pos = start;
+            while (pos != end)
+            {
+                yield return pos;
+                pos += step;
+            }
+
+            yield return pos;
+        }
+```
+
+This will always iterate from `start` to `end`. Combine that with `Zip`, and you've got a set of points to iterate from start to finish:
+
+```csharp
+    var xRange = Utilities.RangeFromTo(Start.X, End.X);
+    var yRange = Utilities.RangeFromTo(Start.Y, End.Y);
+    return xRange.Zip(yRange, (x, y) => new Position(x, y));
+```
+
+`Zip` is one of those utilities I almost never need in my day-to-day work. You can use it to combine two equal length lists into a single list of both. In this case, I'm combining a list of X values and Y values into a single list of `Position` values.

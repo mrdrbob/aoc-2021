@@ -41,7 +41,9 @@
                 }
                 else
                 {
-                    return Enumerable.Empty<Position>();
+                    var xRange = Utilities.RangeFromTo(Start.X, End.X);
+                    var yRange = Utilities.RangeFromTo(Start.Y, End.Y);
+                    return xRange.Zip(yRange, (x, y) => new Position(x, y));
                 }
             }
         }
