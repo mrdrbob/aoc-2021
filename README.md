@@ -116,7 +116,7 @@ The diagonal lines poked at a flaw in my `RangeFromTo` method. With a completely
         }
 ```
 
-This will always iterate from `start` to `end`. Combine that with `Zip`, and you've got a set of points to iterate from start to finish:
+This will always iterate from `start` to `end`. I then generate points for both the X and Y positions, and then `Zip` them together:
 
 ```csharp
     var xRange = Utilities.RangeFromTo(Start.X, End.X);
@@ -125,3 +125,10 @@ This will always iterate from `start` to `end`. Combine that with `Zip`, and you
 ```
 
 `Zip` is one of those utilities I almost never need in my day-to-day work. You can use it to combine two equal length lists into a single list of both. In this case, I'm combining a list of X values and Y values into a single list of `Position` values.
+
+## Day 6 - Part 1
+
+I took a naive approach to this puzzle, which was to model each individual fish and keep a list of them. This is the most direct way to conceptualize the problem and works just fine for smallish . However, I see part two is going to require running to a much bigger number.  Given that the fish population is growing exponentially… I don't think my solution will work for part 2.
+
+Spoiler: it doesn't. At least, not in any reasonable amount of time/memory.
+
