@@ -5,6 +5,56 @@ namespace PageOfBob.Advent2021.App.Days
     public static class Day06
     {
 
+
+        public static void Execute()
+        {
+            var numbers = Utilities.GetEmbeddedData("06").Split(',', StringSplitOptions.RemoveEmptyEntries).AsNumbers();
+            var population = new FishPopulations(8, 7);
+            foreach (var number in numbers)
+                population.AddFishAtAge(number);
+
+            for (var x = 0; x < 256; x++)
+                population.Iterate();
+
+            var total = population.TotalPopulation();
+            Console.WriteLine(total);
+        }
+
+
+        public class FishPopulations
+        {
+            private readonly int maxAge;
+            private readonly int reproductionAge;
+            private List<ulong> populations;
+
+            public FishPopulations(int maxAge, int reproductionAge)
+            {
+                this.maxAge = maxAge;
+                this.reproductionAge = reproductionAge;
+                populations = Enumerable.Repeat(0ul, maxAge + 1).ToList();
+            }
+
+            public void AddFishAtAge(int age)
+            {
+                populations[age] += 1;
+            }
+
+            public void Iterate()
+            {
+                ulong zero = populations[0];
+                for (int age = 1; age <= maxAge; age++)
+                {
+                    populations[age - 1] = populations[age];
+                    if (age == reproductionAge)
+                        populations[age - 1] += zero;
+                }
+                populations[maxAge] = zero;
+            }
+
+            public ulong TotalPopulation() => populations.Aggregate(0ul, (acc, v) => acc + v);
+        }
+
+        /* Part 1
         public static void Execute()
         {
             var numbers = Utilities.GetEmbeddedData("06").Split(',', StringSplitOptions.RemoveEmptyEntries).AsNumbers();
@@ -42,5 +92,6 @@ namespace PageOfBob.Advent2021.App.Days
                 }
             }
         }
+        */
     }
 }

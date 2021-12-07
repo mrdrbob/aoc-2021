@@ -132,3 +132,20 @@ I took a naive approach to this puzzle, which was to model each individual fish 
 
 Spoiler: it doesn't. At least, not in any reasonable amount of time/memory.
 
+## Day 6 - Part 2
+
+So the direct approach of modeling individual fish doesn't work. Dealing with a `List<>` of ~1,600,000,000,000 individual fish is not particularly efficient. Another approach is to model the *population* of fish at each *age*.
+
+Take the example input: `3,4,3,1,2`. Instead of saying, "I have one fish at age 3, one at age 4, one at age 3, one at age 1… etc", group fish together by age: "For age 3, I have two fish. For age 4, I have one fish… etc". Then instead of processing individual fishes, you move the entire population of each age to the next progression.
+
+For example, the population of age 4 fish becomes the population of age 3 fish (because "age" is actually counting down to zero -- age is a poor term here, perhaps "time until reproduction" would be better). The age 5 fish then become age 4, and so on.
+
+There are two special cases to deal with:
+
+1. All age zero fish reproduce.
+2. All age zero fish reset to age 6.
+
+These can be modeled:
+
+1. Set the age 8 population to the age 0 population. Remember all age 8 fish have moved to age 7. All of age 0 has reproduced, so the age 8 number will now equal the age 0 number at the start of the day.
+2. Add the age 0 population (from the start of the day) to the current age 6 population. All the age zero fish get reset to age 6, but they don't *replace* the age 6 population. That population still exists, so we add them to it.
