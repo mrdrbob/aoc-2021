@@ -1,2 +1,2 @@
 ﻿
-PageOfBob.Advent2021.App.Days.Day06.Execute();
+PageOfBob.Advent2021.App.Days.Day07.Execute();

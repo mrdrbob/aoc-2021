@@ -149,3 +149,8 @@ These can be modeled:
 
 1. Set the age 8 population to the age 0 population. Remember all age 8 fish have moved to age 7. All of age 0 has reproduced, so the age 8 number will now equal the age 0 number at the start of the day.
 2. Add the age 0 population (from the start of the day) to the current age 6 population. All the age zero fish get reset to age 6, but they don't *replace* the age 6 population. That population still exists, so we add them to it.
+
+## Day 7 - Part 1
+
+This one is by far my most "golfed" answer. Basically I try every position from the smallest position (of all current crab positions) to the largest. For each position I try, I calculate the delta for each crab and sum that up. Then I find the position where that sum is the smallest number.
+
