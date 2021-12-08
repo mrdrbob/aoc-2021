@@ -152,5 +152,10 @@ These can be modeled:
 
 ## Day 7 - Part 1
 
-This one is by far my most "golfed" answer. Basically I try every position from the smallest position (of all current crab positions) to the largest. For each position I try, I calculate the delta for each crab and sum that up. Then I find the position where that sum is the smallest number.
+This one is by far my most "golfed" answer. Basically I try every position from the smallest position (of all current crab positions) to the largest. For each position I try, I calculate the delta for each crab to that position (the absolute value of desired pos - crab pos) and sum that up. Then I find the position where that sum is the smallest number.
 
+## Day 7 - Part 2
+
+So the small tweak here is to replace the delta calculation (the absolute value of desired pos - crab pos), with a triangle number calculation (and yes, I had to look that up). I didn't bother to find a nice formula (if one exists) for calculating the values, instead I pre-calculate the necessary possible values in a loop and shove them all into a dictionary for quick look up.
+
+Then I can just use the delta calculation to lookup the final fuel usage for each distance.
