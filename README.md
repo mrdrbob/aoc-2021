@@ -159,3 +159,60 @@ This one is by far my most "golfed" answer. Basically I try every position from 
 So the small tweak here is to replace the delta calculation (the absolute value of desired pos - crab pos), with a triangle number calculation (and yes, I had to look that up). I didn't bother to find a nice formula (if one exists) for calculating the values, instead I pre-calculate the necessary possible values in a loop and shove them all into a dictionary for quick look up.
 
 Then I can just use the delta calculation to lookup the final fuel usage for each distance.
+
+## Day 8 - Part 1
+
+Part one is one of those challenges that is largely setting you up for part two. At it's core, part is just parsing the files and counting a few string lengths. Once you put the parsing ceremony aside, it's very nearly a one-liner.
+
+```csharp
+var uniqueLengths = new HashSet<int> { 2, 4, 3, 7 };
+var uniques = numbers.Select(numbers => numbers.OutputValues.Where(v => uniqueLengths.Contains(v.Length)).Count()).Sum();
+```
+
+## Day 8 - Part 2
+
+Part two was quite a bit of fun. For me, the key insight was to deconstruct what I knew about the segments and look for patterns and properties I could exploit. Part 1 gives some big hints in this direction.
+
+For example, let's break down each number, which segments it uses, and the number of segments each uses:
+
+| Number | Segments  | Count | Unique Count? |
+| ------ | --------  | ----- | ------------- |
+| 0      | `abc efg` | 6     | No            |
+| 1      | `  c  f ` | 2     | Yes - 2       |
+| 2      | `a cde g` | 5     | No            |
+| 3      | `a cd fg` | 5     | No            |
+| 4      | ` bcd f ` | 4     | Yes - 4       |
+| 5      | `ab d fg` | 5     | No            |
+| 6      | `ab defg` | 6     | No            |
+| 7      | `a c  f ` | 3     | Yes - 3       |
+| 8      | `abcdefg` | 7     | Yes - 7       |
+| 9      | `abcd fg` | 6     | No            |
+
+So, per part 1, four numbers can be recognized simply by the number of segments lit up. Looking at them closer, we can see that 1 and 7 both share "c" and "f", but only 7 uses "a". So by looking for a pattern with three letters (making it number 7), and looking for the segment that does *not* appear in the two letter pattern (number 1), we can find the segment that corresponds to "a".
+
+That's a good start, but we need more information for some of the other segments. Let's look at how many times each segment is used throughout all ten possible patterns:
+
+| Segment | Frequency | Unique Count? |
+| ------- | --------- | ------------- |
+| a       | 8         | No            |
+| b       | 6         | Yes - 6       |
+| c       | 8         | No            |
+| d       | 7         | No            |
+| e       | 4         | Yes - 4       |
+| f       | 9         | Yes - 9       |
+| g       | 7         | No            |
+
+Because we have all ten possible patterns, we can look at how frequently each segment occurs in those ten arrangements. For the three segments with a unique frequency -- we can figure those out directly.
+
+* Whatever character occurs 6 times in the ten unique patterns maps to "b".
+* Whatever character occurs 4 times is "e". 
+* Whatever character occurs 9 times is "f".
+
+There's four mapped. The other letters do not occur a unique number of times in the patterns, but we can look for other differentiators as necessary.
+
+* "d" and "g" will both occur 7 times in the unique patterns, but only "d" will appear in the four pattern. We can uniquely identify the four pattern because it has 4 segments.
+* "a" and "c" will both appear 8 times in the unique patterns, but only "c" will appear in the "one" pattern, which we identify as the one with 2 segments.
+
+At this point, we've solved everything except "g", which will be whatever letter remains unsolved.
+
+Now that we've built a mapping of mixed up segments to correct segments, we can apply that, look up each number, and aggregate the result in the final decimal number.
