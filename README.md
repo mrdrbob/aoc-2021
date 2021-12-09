@@ -177,16 +177,16 @@ For example, let's break down each number, which segments it uses, and the numbe
 
 | Number | Segments  | Count | Unique Count? |
 | ------ | --------  | ----- | ------------- |
-| 0      | `abc efg` | 6     | No            |
-| 1      | `  c  f ` | 2     | Yes - 2       |
-| 2      | `a cde g` | 5     | No            |
-| 3      | `a cd fg` | 5     | No            |
-| 4      | ` bcd f ` | 4     | Yes - 4       |
-| 5      | `ab d fg` | 5     | No            |
-| 6      | `ab defg` | 6     | No            |
-| 7      | `a c  f ` | 3     | Yes - 3       |
+| 0      | `abc_efg` | 6     | No            |
+| 1      | `__c__f_` | 2     | Yes - 2       |
+| 2      | `a_cde_g` | 5     | No            |
+| 3      | `a_cd_fg` | 5     | No            |
+| 4      | `_bcd_f_` | 4     | Yes - 4       |
+| 5      | `ab_d_fg` | 5     | No            |
+| 6      | `ab_defg` | 6     | No            |
+| 7      | `a_c__f_` | 3     | Yes - 3       |
 | 8      | `abcdefg` | 7     | Yes - 7       |
-| 9      | `abcd fg` | 6     | No            |
+| 9      | `abcd_fg` | 6     | No            |
 
 So, per part 1, four numbers can be recognized simply by the number of segments lit up. Looking at them closer, we can see that 1 and 7 both share "c" and "f", but only 7 uses "a". So by looking for a pattern with three letters (making it number 7), and looking for the segment that does *not* appear in the two letter pattern (number 1), we can find the segment that corresponds to "a".
 
@@ -216,3 +216,9 @@ There's four mapped. The other letters do not occur a unique number of times in 
 At this point, we've solved everything except "g", which will be whatever letter remains unsolved.
 
 Now that we've built a mapping of mixed up segments to correct segments, we can apply that, look up each number, and aggregate the result in the final decimal number.
+
+## Day  9 - Part 1
+
+Once again we've got a map of data we need to scan. Once again, I represent the map as a single-dimension array of data.
+
+One small way to make this simpler is to make a function gets values at a point and *handles invalid positions*. Somewhere you have to check the above, below, left and right points. You could put your "point is valid" check for each of those positions, but that's four times the logic and four times the potential for mistakes. I'd suggest you centralize it in the "get value at point" logic.
