@@ -222,3 +222,20 @@ Now that we've built a mapping of mixed up segments to correct segments, we can 
 Once again we've got a map of data we need to scan. Once again, I represent the map as a single-dimension array of data.
 
 One small way to make this simpler is to make a function gets values at a point and *handles invalid positions*. Somewhere you have to check the above, below, left and right points. You could put your "point is valid" check for each of those positions, but that's four times the logic and four times the potential for mistakes. I'd suggest you centralize it in the "get value at point" logic.
+
+## Day 9 - Part 2
+
+So part 2 throws a minor wrench in the works, where you need to figure out how large each "basin" is. Conceptually, you "fan out" from the center point, then fan out from each of those points, then from each of *those* points. The pattern you're seeing is recursion, but I decided not to go that route.
+
+Instead, I'm using a `Stack<>` to give me recursion-like behavior. Here's the breakdown of how it works:
+
+1. Pre-fill the stack with the low point to start at.
+2. Loop the following for as long as there are any points remaining in the stack:
+   1. Pop a point off the stack. If I've already processed this point, bail out and loop.
+   2. Mark this point as visited (keep a list of visited points in a `HashSet`).
+   3. If there is no value at this point (the x, y refer to a point outside the map), bail out and loop.
+   4. If the point is a 9, bail out and loop. (We don't want to add anything to the total or queue up any surrounding points)
+   5. Otherwise, the point is valid and < 9, so add one to the total.
+   6. Push the four surrounding points to the stack. (To be more efficient, one could check here if the points have already been visited *before* adding to the stack. I didn't; I'm lazy.)
+
+Again, this could all probably be a recursive function. In theory, it's possible you could hit a stack overflow if the function recursed too much, but that would be a **lot** of recursion. I did not try this route with this question, though. With a manual stack like above, your "recursion" is pretty much only limited by the amount of available memory.
