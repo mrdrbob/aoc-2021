@@ -239,3 +239,10 @@ Instead, I'm using a `Stack<>` to give me recursion-like behavior. Here's the br
    6. Push the four surrounding points to the stack. (To be more efficient, one could check here if the points have already been visited *before* adding to the stack. I didn't; I'm lazy.)
 
 Again, this could all probably be a recursive function. In theory, it's possible you could hit a stack overflow if the function recursed too much, but that would be a **lot** of recursion. I did not try this route with this question, though. With a manual stack like above, your "recursion" is pretty much only limited by the amount of available memory.
+
+## Day 10 - Part 1
+
+This is a pretty classic stack problem. The simple version is to iterate through all the characters. If it's an "opening" character, push it on the stack. If it's a closing character, pop whatever's on the stack off. If it's what you expect, keep going. If it's the wrong character, stop and return the score of the wrong character. Then sum that up.
+
+The instructions say to ignore incomplete, but otherwise valid lines. This is implicitly done by just not checking if the stack is empty at the end of a line.
+
