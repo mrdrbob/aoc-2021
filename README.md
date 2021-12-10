@@ -246,3 +246,8 @@ This is a pretty classic stack problem. The simple version is to iterate through
 
 The instructions say to ignore incomplete, but otherwise valid lines. This is implicitly done by just not checking if the stack is empty at the end of a line.
 
+## Day 10 - Part 2
+
+Once again, a lot of little details to get right. I started by modifying my part 1 solution to return both the score *and* the remaining stack. Then for every line that does not have a score (and therefore no invalid characters), I can look at the remaining stack to calculate the part 2 score. That's a matter of popping the stack until it's empty, and for each character looking for the expected closing tag, then multiplying/adding.
+
+A word of caution: the numbers get, like, really big. `int` won't cut it here.
