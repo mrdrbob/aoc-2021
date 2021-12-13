@@ -42,8 +42,8 @@ namespace PageOfBob.Advent2021.App.Days
             // Part 2
             var scores = Utilities.GetEmbeddedData("10").Lines().Select(CalculatePart2Score).Where(x => x.HasValue).Select(x => x.Value).ToList();
             scores.Sort();
-            Console.WriteLine(scores.Count);
-            scores.ForEach(Console.WriteLine);
+            //Console.WriteLine(scores.Count);
+            //scores.ForEach(Console.WriteLine);
             var middle = scores[scores.Count / 2];
             Console.WriteLine(middle);
         }
@@ -60,9 +60,9 @@ namespace PageOfBob.Advent2021.App.Days
                 var closing = Brackets[remainingStack.Pop()];
                 var value = (ulong)Scores2[closing];
                 score = (score * 5) + value;
-                Console.Write(closing);
+                // Console.Write(closing);
             }
-            Console.WriteLine(" {0}", score);
+            // Console.WriteLine(" {0}", score);
             return score;
         }
 

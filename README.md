@@ -251,3 +251,24 @@ The instructions say to ignore incomplete, but otherwise valid lines. This is im
 Once again, a lot of little details to get right. I started by modifying my part 1 solution to return both the score *and* the remaining stack. Then for every line that does not have a score (and therefore no invalid characters), I can look at the remaining stack to calculate the part 2 score. That's a matter of popping the stack until it's empty, and for each character looking for the expected closing tag, then multiplying/adding.
 
 A word of caution: the numbers get, like, really big. `int` won't cut it here.
+
+## Day 11 - Part 1
+
+For me, the solution for this one is to carefully separate steps, carefully track which octopuses have flashed, iterating as long as it takes to process all the octopuses that have flashed.
+
+I decided to go with a mutable map this, and write some helper extension methods for mutating map. With those, I can break down the process as such:
+
+1. Add 1 to every octopus.
+2. Pull the position for every octopus that is ready to flash (has an energy greater than 9). Add the count to the total number of flashes for this step.
+3. Set all of those positions' energy levels to null (so octopuses who flashed don't get more energy -- they should all be 0 at the end of the step)
+4. Get all the surrounding positions for every octopus that flashed.
+5. Add 1 to every position (that isn't null) surrounding an octopus that flashed.
+6. Look for any new octopuses that having reached energy > 9. If there are any, repeat from #2.
+7. Otherwise, all flashing is done this round. Set all the null energy levels to 0.
+8. Return the total number of flashes for this step.
+
+Execute the above 100 times, summing up the totals.
+
+## Day 11 - Part 2
+
+Part two is taking the solution from part one, and running it until a single step produces 100 flashes (every octopus flashed in a single step). Because the solution from part one returns the number of flashes per step, this modification is pretty trivial.
