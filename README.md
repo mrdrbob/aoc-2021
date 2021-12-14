@@ -272,3 +272,16 @@ Execute the above 100 times, summing up the totals.
 ## Day 11 - Part 2
 
 Part two is taking the solution from part one, and running it until a single step produces 100 flashes (every octopus flashed in a single step). Because the solution from part one returns the number of flashes per step, this modification is pretty trivial.
+
+## Day 12 - Part 1
+
+Today's challenge is a problem of visiting nodes. So I took the recursion-lite approach here, where I use stack to keep track of paths I need to visit.
+
+1. Push the start cave on the stack. (Our starting "path" is just the starting cave.)
+2. Loop the following for as long as there is something in the stack:
+   1. Pop a path off the stack.
+   2. Check the last cave at the end of the current path. Is it "end"? Yield that one.
+   3. For each cave that is connected to this one, if it's a big cave, or a small cave that doesn't already appear in this path, then push a new path ending in that connected cave.
+   4. LOOP
+
+Then we count up all the yielded caves.

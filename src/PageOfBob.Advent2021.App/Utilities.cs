@@ -42,6 +42,17 @@
 
             yield return pos;
         }
+
+        public static T GetOrCreate<K, T>(this Dictionary<K, T> dictionary, K key, Func<K, T> create)
+            where K : notnull
+        {
+            if (dictionary.TryGetValue(key, out T? existingValue))
+                return existingValue;
+
+            var newValue = create(key);
+            dictionary.Add(key, newValue);
+            return newValue;
+        }
             
     }
 }
