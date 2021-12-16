@@ -285,3 +285,15 @@ Today's challenge is a problem of visiting nodes. So I took the recursion-lite a
    4. LOOP
 
 Then we count up all the yielded caves.
+
+## Day 12 - Part 2
+
+Falling behind a bit here both on completing puzzles, and on writing up puzzles. For part two, I chose to tackle it by first figuring out all the applicable lowercase cave names (excluding `start`). Then for each lowercase name, I follow most of the logic from part one, except that I allow that lowercase cave to be visited at most twice. For me, there were a few keys to getting this one done:
+
+1. The "start" node can only ever be visited once, so I had to add logic to exclude that from the possible nodes to visit twice.
+2. I found it helpful to break the logic out for the special case on a separate line. This just made it easier to reason about and get right.
+3. I had been just using a simple "contains" against the current path, but for the special case, I had to check the count instead.
+
+For things like this, where the logic starts to feel complicated, the way to make it easier to read and simpler to comprehend is to break it into small chunks, and give each chunk a sensible name. In some cases, that means breaking a long string of inline logic or calculations in a series of well-named variables. Or chunks of instructions into well-named methods/functions.
+
+Now, in my case, `isSpecialCase` is far from well-named, but it is at least a separate chunk that can be reasoned independently of all other pieces of logic related to cave iteration.
