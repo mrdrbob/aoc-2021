@@ -31,48 +31,9 @@ namespace PageOfBob.Advent2021.App.Days
             Console.WriteLine(step);
         }
 
-        public record Map<T>(int Width, int Height, List<T> Data)
-        {
-            public int DataPosition(Position pos) => pos.Y * Width + pos.X;
-            public T Get(Position pos) => Data[DataPosition(pos)];
-            public void Set(Position pos, T value) => Data[DataPosition(pos)] = value;
-            public void Modify(Position pos, Func<T, T> modify) => Set(pos, modify(Get(pos)));
-        }
-
-        public static IEnumerable<Position> GetAllPositions<T>(this Map<T> map)
-        {
-            for (int y = 0; y < map.Height; y++)
-            {
-                for (int x = 0; x < map.Width; x++)
-                {
-                    yield return new Position(x, y);
-                }
-            }
-        }
-
-        public static void Print(this Map<int?> map)
-        {
-            for (int y = 0; y < map.Height; y++)
-            {
-                for (int x = 0; x < map.Width; x++)
-                {
-                    Console.Write(map.Get(new Position(x, y)));
-                }
-                Console.WriteLine();
-            }
-            Console.WriteLine();
-        }
-
-        public static void Mutate<T>(this Map<T> map, Func<Position, T, T> modify)
-        {
-            foreach (var pos in map.GetAllPositions())
-            {
-                map.Set(pos, modify(pos, map.Get(pos)));
-            }
-        }
-
         public static IEnumerable<Position> GetFlashes(this Map<int?> map)
             => map.GetAllPositions().Where(pos => map.Get(pos) > 9);
+
         public static IEnumerable<Position> GetSurroundingPoints(this Position position, int width, int height)
             => Utilities.RangeFromTo(position.X - 1, position.X + 1)
                 .SelectMany(x => Utilities.RangeFromTo(position.Y - 1, position.Y + 1).Select(y => new Position(x, y)))
@@ -112,7 +73,5 @@ namespace PageOfBob.Advent2021.App.Days
 
             return totalFlashes;
         }
-
-        public record struct Position(int X, int Y);
     }
 }

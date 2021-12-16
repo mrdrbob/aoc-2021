@@ -297,3 +297,20 @@ Falling behind a bit here both on completing puzzles, and on writing up puzzles.
 For things like this, where the logic starts to feel complicated, the way to make it easier to read and simpler to comprehend is to break it into small chunks, and give each chunk a sensible name. In some cases, that means breaking a long string of inline logic or calculations in a series of well-named variables. Or chunks of instructions into well-named methods/functions.
 
 Now, in my case, `isSpecialCase` is far from well-named, but it is at least a separate chunk that can be reasoned independently of all other pieces of logic related to cave iteration.
+
+## Day 13 - Part 1
+
+I've found myself using 2d grid-like structures in several of these puzzles, so I went ahead and made it official and moved the map structure from Day 11 into it's own, generic thing. Now I can just add extension methods as necessary for various bits of logic.
+
+This one was mostly about getting the `FoldVertical` and `FoldHorizontal` logic correct. There are more elegant ways to do this than what I've done, but I'm good with what I've got.
+
+To do the folding, I create a new Map at the appropriate size for the fold. Then I iterate all the points on the side that is being folded. I calculate where the transposed point would land. Then if either the transposed point is set, or the original point at the transposed position is set, I set that point in the new map.
+
+## Day 13 - Part 2
+
+So in Part 1, all of the folding you'll be doing is on the *halfway line.* When I wrote my Part 1 solution, I inadvertently assumed that would always be the case and used the width/height to calculate the transposed values. But for Part 2, that assumption falls apart. I had to tweak my transposition calculation:
+
+From: `var dest = new Position(map.Width - pos.X - 1, pos.Y);`
+To: `var dest = new Position(x - (pos.X - x), pos.Y);`
+
+Now instead of reflecting on the halfway point, I'm reflecting on the axis (`x` in the above example) instead.
