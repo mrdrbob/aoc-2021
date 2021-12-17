@@ -53,6 +53,13 @@
             dictionary.Add(key, newValue);
             return newValue;
         }
-            
+
+        public static void Plus<T>(this Dictionary<T, int> dictionary, T key, int? amount = null)
+            where T : notnull
+            => dictionary[key] = dictionary.TryGetValue(key, out int existingValue) ? existingValue + (amount.HasValue ? amount.Value : 1) : (amount.HasValue ? amount.Value : 1);
+
+        public static void Plus<T>(this Dictionary<T, ulong> dictionary, T key, ulong? amount = null)
+            where T : notnull
+            => dictionary[key] = dictionary.TryGetValue(key, out ulong existingValue) ? existingValue + (amount.HasValue ? amount.Value : 1) : (amount.HasValue ? amount.Value : 1);
     }
 }

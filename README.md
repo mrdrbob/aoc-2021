@@ -321,3 +321,33 @@ Sometimes when you do these you just know the next part is going to be "Good job
 
 About the only "clever" thing I did here was to iterate through the list backwards, so I don't have to deal with the fact that my index changes as I insert new characters. But the whole "insert a character at this index" thing is horribly inefficient. It's a small solution, easy to reason about, but it 100% won't work if the next part is "run it longer".
 
+## Day 14 - Part 2
+
+As expected, part 2 was just "do the thing a whole bunch more," which did not work. (Technically, given enough time and memory, I guess it would *eventually* have worked—possibly not before the heat death of universe, but eventually.) So similar to the exponential fish population growth of day 6, we hae to think about modeling this from a different angle.
+
+Rather than a string of characters, think about the problem as a collection of character pairs with a corresponding count. The rules then describe adding to pair counts, rather than inserting characters in random places.
+
+For example, `NNCB` becomes:
+
+| Pair | Count |
+| ---- | ----- |
+| NN   | 1     |
+| NC   | 1     |
+| CB   | 1     |
+
+And the first rule like `NN -> C` no longer creates `NCN`, but rather it's corresponding pairs: `NC` and `CN`. If we apply that rule, we get:
+
+| Pair | Count |
+| ---- | ----- |
+| NN   | 0     |
+| NC   | 2     |
+| CN   | 1     |
+| CB   | 1     |
+
+Notice we lose `NN` (it matched a rule, so we remove that value and add the corresponding values). We carry over the values that did not match a rule (`NC` and `CB`).  And add the values for each insertion rule (`NC` and `CN`). `NC` comes through twice, once because it was carried over, and once as a result of the rule. We some those counts together to get 2.
+
+In practice, it's slightly easier because the rulesets we're given have every possible combination of letters, so you don't actually have to handle the "I don't have a rule for this" case.
+
+The final trick is summing up the character frequency. You can just sum up the first and second character of each pair; each letter is part of a *pair*, so you'll end up with double the value. I would around this by just counting the frequency of the second letter of each pair. That will leave out the first letter of the template, right? Well, *that* letter will never change. It will always be whatever it is, because all insertions happen after it. So I just keep track of what that letter was, and give it a count of one before I start summing up the others.
+
+Finally, I just assumed at a 32 bit signed integer wasn't going to be big enough, so I updating everything to `uint`.
