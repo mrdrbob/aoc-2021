@@ -314,3 +314,10 @@ From: `var dest = new Position(map.Width - pos.X - 1, pos.Y);`
 To: `var dest = new Position(x - (pos.X - x), pos.Y);`
 
 Now instead of reflecting on the halfway point, I'm reflecting on the axis (`x` in the above example) instead.
+
+## Day 14 - Part 1
+
+Sometimes when you do these you just know the next part is going to be "Good job, hotshot, now run it for twice as long as watch as you computer melts because you did the naive thing!" -- which is exactly what I did. I represent the template just as a list of characters. The polymerization rules are just character pairs mapping to a resulting insertion character.
+
+About the only "clever" thing I did here was to iterate through the list backwards, so I don't have to deal with the fact that my index changes as I insert new characters. But the whole "insert a character at this index" thing is horribly inefficient. It's a small solution, easy to reason about, but it 100% won't work if the next part is "run it longer".
+
