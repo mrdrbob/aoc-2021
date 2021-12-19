@@ -351,3 +351,13 @@ In practice, it's slightly easier because the rulesets we're given have every po
 The final trick is summing up the character frequency. You can just sum up the first and second character of each pair; each letter is part of a *pair*, so you'll end up with double the value. I would around this by just counting the frequency of the second letter of each pair. That will leave out the first letter of the template, right? Well, *that* letter will never change. It will always be whatever it is, because all insertions happen after it. So I just keep track of what that letter was, and give it a count of one before I start summing up the others.
 
 Finally, I just assumed at a 32 bit signed integer wasn't going to be big enough, so I updating everything to `uint`.
+
+## Day 15 - Part 1
+
+Path finding is not my forte.
+
+I made an attempt with doing absolutely no research, and came up with an algorithm that could reasonably quickly find *a* short path. Just not, *the shortest* path. When I adjusted it to find *the shortest* path, it basically took forever to run.
+
+But after some learning about path-finding algorithms, I decided to give Dijkstra's algorithm a try. I'd write up an explanation, but honestly, [this video](https://youtu.be/EFg3u_E6eHU) would do a much better job explaining than I could in text.
+
+So beyond saying "I used Dijkstra's algorithm," there's not much to say here. My implementation is not particularly efficient. I don't use a priority queue. I don't keep separate sets of explored vs unexplored nodes. So the solution takes ten whole seconds to run on my machine. I'm guessing for part two, I'll need to make some performance improvements.

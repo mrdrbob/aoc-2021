@@ -61,5 +61,14 @@
         public static void Plus<T>(this Dictionary<T, ulong> dictionary, T key, ulong? amount = null)
             where T : notnull
             => dictionary[key] = dictionary.TryGetValue(key, out ulong existingValue) ? existingValue + (amount.HasValue ? amount.Value : 1) : (amount.HasValue ? amount.Value : 1);
+
+        public static IEnumerable<Position> GetOrdinalPositions(this Position position, int width, int height)
+            => new[]
+            {
+                new Position(position.X + 1, position.Y),
+                new Position(position.X - 1, position.Y),
+                new Position(position.X, position.Y + 1),
+                new Position(position.X, position.Y - 1),
+            }.Where(pos => pos.X >= 0 && pos.Y >= 0 && pos.X < width && pos.Y < height);
     }
 }
