@@ -29,15 +29,12 @@
             */
 
             // Part 2:
-            var o2Rating = FilterBits(bitList, 0, (t, count) => t == (count.On >= count.Off)).ToUint();
-            var co2Rating = FilterBits(bitList, 0, (t, count) => t == !(count.On >= count.Off)).ToUint();
+            var o2Rating = FilterBits(bitList, 0, (t, count) => t == (count.On >= count.Off)).ToUint(BitLength);
+            var co2Rating = FilterBits(bitList, 0, (t, count) => t == !(count.On >= count.Off)).ToUint(BitLength);
             Console.WriteLine(o2Rating);
             Console.WriteLine(co2Rating);
             Console.WriteLine(o2Rating * co2Rating);
         }
-
-        private static uint ToUint(this bool[] value)
-            => Enumerable.Range(0, BitLength).Aggregate(0u, (output, position) => value[position] ? output.WithBitSetAtPosition(position) : output);
 
         private static bool[] FilterBits(IEnumerable<bool[]> lines, int position, Func<bool, BitCount, bool> filterCriteria)
         {
@@ -56,9 +53,6 @@
 
         public static BitCount GetBitCount(this IEnumerable<bool[]> list, int position)
             => list.Aggregate(new BitCount(), (acc, line) => acc.Add(line[position]));
-
-        public static uint WithBitSetAtPosition(this uint value, int position)
-            => value | (1u << (BitLength - position - 1));
 
         public record struct BitCount(int On, int Off)
         {

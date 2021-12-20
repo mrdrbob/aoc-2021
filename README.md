@@ -371,3 +371,9 @@ The only real change I had to make was to make the map larger. I considered writ
 But then I thought: it's a simple pattern, I could generalize that into a wrapper and make a *virtual* map. So I generalized my `Map<>` structure into an `IMap<>` interface, updated my extension methods to expect `IMap<>` instead, and then wrote a wrapper that tracks the stamp data, then dynamically calculates the values for all the other possible positions.
 
 Beyond that, the improved take on Dijkstra's algorithm from part 1 worked quite well. Around 600 ms in debug mode.
+
+## Day 16 - Part 1
+
+Fundamentally this is a parsing challenge. Now, it probably would have been faster to just hand-write a simple parser (especially given some of the more dynamic rules), but I wrote a [a little parsing library](https://github.com/mrdrbob/parsing), and I couldn't resist using it for this.
+
+For the most part it worked well. I didn't have anything in the base library that could handle parsing rules that depended on parsed content, but it wasn't too difficult to hack-in (see the `SubparseByLength` and `SubparseByTimes` rules).

@@ -15,4 +15,8 @@
     <EmbeddedResource Include="Data\*.txt" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="PageOfBob.Parsing" Version="1.0.3" />
+  </ItemGroup>
+
 </Project>
