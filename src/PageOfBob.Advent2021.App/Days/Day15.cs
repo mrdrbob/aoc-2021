@@ -2,16 +2,70 @@
 {
     public static class Day15
     {
+
+        public static void Execute()
+        {
+            var rawMap = Utilities.GetEmbeddedData("15").Replace("\n", "").Replace("\r", "").Select(x => int.Parse(x.ToString())).ToList();
+            var stampSize = (int)Math.Sqrt(rawMap.Count);
+            var stamp = new Map<int>(stampSize, stampSize, rawMap);
+
+            var map = new ScaledMap(stamp, 5);
+            // map.Print(x => x.ToString());
+
+            var totalRisk = FindShortestPath(map).Select(x => x.Risk).Sum() - map.Get(new Position(0, 0));
+            Console.WriteLine(totalRisk);
+
+
+        }
+
+        public class ScaledMap : IMap<int>
+        {
+            private readonly Map<int> map;
+            private readonly int scale;
+
+            public int Width => map.Width * scale;
+            public int Height => map.Height * scale;
+
+            public ScaledMap(Map<int> map, int scale)
+            {
+                this.map = map;
+                this.scale = scale;
+            }
+
+            public int Get(Position pos)
+            {
+                var xScale = pos.X / map.Width;
+                var yScale = pos.Y / map.Height;
+
+                var xPos = pos.X - (map.Width * xScale);
+                var yPos = pos.Y - (map.Height * yScale);
+
+                var value = map.Get(new Position(xPos, yPos));
+                var scaledValue = (value + xScale + yScale);
+                while (scaledValue > 9)
+                    scaledValue -= 9;
+                return scaledValue;
+            }
+
+            public void Set(Position pos, int value)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        /* Part 1
         public static void Execute()
         {
             var rawMap = Utilities.GetEmbeddedData("15").Replace("\n", "").Replace("\r", "").Select(x => int.Parse(x.ToString())).ToList();
             var size = (int)Math.Sqrt(rawMap.Count);
             var map = new Map<int>(size, size, rawMap);
+
             var totalRisk = FindShortestPath(map).Select(x => x.Risk).Sum() - map.Get(new Position(0, 0));
             Console.WriteLine(totalRisk);
         }
+        */
 
-        private static IEnumerable<(Position Position, int Risk)> FindShortestPath(Map<int> map)
+        private static IEnumerable<(Position Position, int Risk)> FindShortestPath(IMap<int> map)
         {
             var nodes = map.GetAllPositions()
                 .Select(x => new Node(x, map.Get(x)));

@@ -363,3 +363,11 @@ But after some learning about path-finding algorithms, I decided to give Dijkstr
 So beyond saying "I used Dijkstra's algorithm," there's not much to say here. My implementation is not particularly efficient. I don't use a priority queue. I don't keep separate sets of explored vs unexplored nodes. So the solution takes ten whole seconds to run on my machine. I'm guessing for part two, I'll need to make some performance improvements.
 
 **Update**: The dude could not abide a 10 second run time. I swapped out my lazy "one list to rule them all" and swapped in two separate dictionaries to have fast look up for explored and unexplored nodes, plus a priority queue for which position to explore next. Rather than adjust priorities in the priority queue, I just queue up the same position again with a smaller risk. When the duplicate position comes up in the queue, because a shorter path has already been found, that position will be in the explored nodes dictionary, so I just pop it off the stack and ignore it if it's already been explored. Seems to work well enough. Runtime went from around 10 seconds to around 200 ms in debug mode.
+
+## Day 15 - Part 2
+
+The only real change I had to make was to make the map larger. I considered writing some utility methods to "stamp" the small map out into a large map, making the value changes as I went.
+
+But then I thought: it's a simple pattern, I could generalize that into a wrapper and make a *virtual* map. So I generalized my `Map<>` structure into an `IMap<>` interface, updated my extension methods to expect `IMap<>` instead, and then wrote a wrapper that tracks the stamp data, then dynamically calculates the values for all the other possible positions.
+
+Beyond that, the improved take on Dijkstra's algorithm from part 1 worked quite well. Around 600 ms in debug mode.

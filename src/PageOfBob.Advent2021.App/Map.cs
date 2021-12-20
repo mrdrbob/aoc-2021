@@ -1,17 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace PageOfBob.Advent2021.App
+﻿namespace PageOfBob.Advent2021.App
 {
-    public record Map<T>(int Width, int Height, List<T> Data)
+    public record Map<T>(int Width, int Height, List<T> Data) : IMap<T>
     {
         public int DataPosition(Position pos) => pos.Y * Width + pos.X;
         public T Get(Position pos) => Data[DataPosition(pos)];
         public void Set(Position pos, T value) => Data[DataPosition(pos)] = value;
-        public void Modify(Position pos, Func<T, T> modify) => Set(pos, modify(Get(pos)));
+    }
+
+    public interface IMap<T>
+    {
+        int Width { get; }
+        int Height { get; }
+
+        public T Get(Position pos);
+        public void Set(Position pos, T value);
     }
 
     public static class Map
@@ -30,7 +32,9 @@ namespace PageOfBob.Advent2021.App
 
     public static class MapExtensions
     {
-        public static IEnumerable<Position> GetAllPositions<T>(this Map<T> map)
+        public static void Modify<T>(this IMap<T> map, Position pos, Func<T, T> modify) => map.Set(pos, modify(map.Get(pos)));
+
+        public static IEnumerable<Position> GetAllPositions<T>(this IMap<T> map)
         {
             for (int y = 0; y < map.Height; y++)
             {
@@ -41,7 +45,7 @@ namespace PageOfBob.Advent2021.App
             }
         }
 
-        public static void Print<T>(this Map<T> map, Func<T, string> toString)
+        public static void Print<T>(this IMap<T> map, Func<T, string> toString)
         {
             for (int y = 0; y < map.Height; y++)
             {
@@ -54,7 +58,7 @@ namespace PageOfBob.Advent2021.App
             Console.WriteLine();
         }
 
-        public static void Mutate<T>(this Map<T> map, Func<Position, T, T> modify)
+        public static void Mutate<T>(this IMap<T> map, Func<Position, T, T> modify)
         {
             foreach (var pos in map.GetAllPositions())
             {
