@@ -14,25 +14,39 @@
         private static IEnumerable<(Position Position, int Risk)> FindShortestPath(Map<int> map)
         {
             var nodes = map.GetAllPositions()
-                .Select(x => new Node(x, map.Get(x)))
-                .ToList();
+                .Select(x => new Node(x, map.Get(x)));
+
+            var explored = new Dictionary<Position, Node>();
+            var unexplored = new Dictionary<Position, Node>();
+
+            foreach (var node in nodes)
+                unexplored.Add(node.Position, node);
 
             var zero = new Position(0, 0);
             var end = new Position(map.Width - 1, map.Height - 1);
 
-            var startNode = nodes.Single(x => x.Position == zero);
+            var startNode = unexplored[zero];
             startNode.Estimate = 0;
+
+            var priorityQueue = new PriorityQueue<Position, int>();
+            priorityQueue.Enqueue(zero, 0);
 
 
             while (true)
             {
-                var node = nodes.Where(x => !x.Explored).OrderBy(x => x.Estimate).First();
+                var position = priorityQueue.Dequeue();
+
+                if (explored.ContainsKey(position))
+                    continue;
+
+                var node = unexplored[position];
+
                 if (node.Position == end)
                 {
                     while (node.Via.HasValue)
                     {
                         yield return (node.Position, node.Risk);
-                        node = nodes.Single(x => x.Position == node.Via);
+                        node = explored[node.Via.Value];
                     }
 
                     yield return (node.Position, node.Risk);
@@ -40,8 +54,8 @@
                 }
 
                 var nodesToVisit = node.Position.GetOrdinalPositions(map.Width, map.Height)
-                    .Select(p => nodes.Single(n => n.Position == p))
-                    .Where(n => !n.Explored);
+                    .Where(p => unexplored.ContainsKey(p))
+                    .Select(p => unexplored[p]);
 
                 foreach (var n in nodesToVisit)
                 {
@@ -50,10 +64,12 @@
                     {
                         n.Estimate = totalEstimate;
                         n.Via = node.Position;
+                        priorityQueue.Enqueue(n.Position, n.Estimate);
                     }
                 }
 
-                node.Explored = true;
+                explored.Add(position, node);
+                unexplored.Remove(position);
             }
         }
 
@@ -68,7 +84,6 @@
             public Position Position { get; }
             public int Risk { get; }
 
-            public bool Explored { get; set; }
             public int Estimate { get; set; } = int.MaxValue;
             public Position? Via { get; set; }
         }
