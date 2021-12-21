@@ -383,3 +383,16 @@ For the most part it worked well. I didn't have anything in the base library tha
 The hardest part of Part 2 was my dumb assumption that `uint` should be big enough for anyone. I had to refactor some stuff to use `ulong` instead.
 
 Otherwise, the new C# `switch` pattern matching works great here, where I can match types, values, and use expressions for cases.
+
+## Day 17 - Part 1
+
+Oof. I won't lie. My solution here is *ugly*.
+
+First, for part 1 at least, I'm completely ignoring the X access. I run step-by-step simulations trying different starting Y velocities until I find the first starting velocity that works. That should be the shortest y value that lands in the target.
+
+THEN I continue upping the starting velocity until it overshoots the target. That does not actually produce the highest y position, just the first one that overshoots.
+
+THEN I take whatever my velocity is and multiply by five. Then that's how many more times I will bump the velocity and attempt the simulation. I keep the highest successful run from these attempts. Five is a totally arbitrary number, but seemed large enough to come up with the correct result.
+
+This is like calculating pi by throwing hotdogs. Sure, it gets approximately the correct answer, but it's messy and dumb looking.
+
