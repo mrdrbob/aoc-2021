@@ -29,8 +29,8 @@
             */
 
             // Part 2:
-            var o2Rating = FilterBits(bitList, 0, (t, count) => t == (count.On >= count.Off)).ToUint(BitLength);
-            var co2Rating = FilterBits(bitList, 0, (t, count) => t == !(count.On >= count.Off)).ToUint(BitLength);
+            var o2Rating = FilterBits(bitList, 0, (t, count) => t == (count.On >= count.Off)).ToUlong(BitLength);
+            var co2Rating = FilterBits(bitList, 0, (t, count) => t == !(count.On >= count.Off)).ToUlong(BitLength);
             Console.WriteLine(o2Rating);
             Console.WriteLine(co2Rating);
             Console.WriteLine(o2Rating * co2Rating);

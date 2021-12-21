@@ -29,7 +29,7 @@ namespace PageOfBob.Advent2021.App.Days
 
             var PACKETS = PACKET_REF.Many(true);
 
-            var VERSION = BIT.Times(3).AsUint();
+            var VERSION = BIT.Times(3).AsUlong();
 
             var LITERAL_TYPE_ID = Sequence(new[] { ON, OFF, OFF });
             var LITERAL_GROUP_WITH_MORE = ON.ThenKeep(BIT.Times(4));
@@ -38,13 +38,13 @@ namespace PageOfBob.Advent2021.App.Days
                 .ThenKeep(LITERAL_GROUP_WITH_MORE.Many())
                 .Then(LITERAL_GROUP_WITHOUT_MORE, (moreGroups, endGroup)
                     => moreGroups.SelectMany(x => x).Concat(endGroup).ToArray())
-                .AsUint()
+                .AsUlong()
                 .Map(value => (IPacketValue)new Literal(value));
 
             // We check for literal first, so any other type should match this.
-            var OPERATOR_TYPE_ID = BIT.Times(3).AsUint();
-            var TYPE_0_LENGTH = OFF.ThenKeep(BIT.Times(15)).AsUint(); // Total bits
-            var TYPE_1_LENGTH = ON.ThenKeep(BIT.Times(11)).AsUint(); // Total packets
+            var OPERATOR_TYPE_ID = BIT.Times(3).AsUlong();
+            var TYPE_0_LENGTH = OFF.ThenKeep(BIT.Times(15)).AsUlong(); // Total bits
+            var TYPE_1_LENGTH = ON.ThenKeep(BIT.Times(11)).AsUlong(); // Total packets
 
             var OPERATOR_TYPE_0 = TYPE_0_LENGTH
                 .SubparseByLength(PACKET_REF.Many());
@@ -64,21 +64,44 @@ namespace PageOfBob.Advent2021.App.Days
 
             var ONE_PACKET = PACKET.ThenIgnore(ZERO_PADDING).ThenEnd();
 
-            var result = ONE_PACKET(source).Match(
+            var packet = ONE_PACKET(source).Match(
                 fail => throw new NotImplementedException(fail.Message),
                 success => {
                     Console.WriteLine(success.Value.ToString()); 
-                    var versionSum = AddUpPacketVersionNumbers(success.Value);
-                    Console.WriteLine(versionSum);
+                    // var versionSum = AddUpPacketVersionNumbers(success.Value);
+                    // Console.WriteLine(versionSum);
                     return success.Value; 
                 });
+
+            var value = GetPacketValue(packet);
+            Console.WriteLine(value);
         }
 
-        public static uint AddUpPacketVersionNumbers(Packet packet)
+        public static ulong GetPacketValue(Packet packet)
+        {
+            return packet.Value switch
+            {
+                Literal l => (ulong)l.Value,
+                Operator op => op.TypeId switch
+                {
+                    0 => op.SubPackets.Select(GetPacketValue).Cast<ulong>().Aggregate(0ul, (acc, v) => acc + v),
+                    1 => op.SubPackets.Select(GetPacketValue).Cast<ulong>().Aggregate(1ul, (acc, v) => acc * v),
+                    2 => op.SubPackets.Select(GetPacketValue).Cast<ulong>().Min(),
+                    3 => op.SubPackets.Select(GetPacketValue).Cast<ulong>().Max(),
+                    5 => GetPacketValue(op.SubPackets[0]) > GetPacketValue(op.SubPackets[1]) ? 1ul : 0,
+                    6 => GetPacketValue(op.SubPackets[0]) < GetPacketValue(op.SubPackets[1]) ? 1ul : 0,
+                    7 => GetPacketValue(op.SubPackets[0]) == GetPacketValue(op.SubPackets[1]) ? 1ul : 0,
+                    _ => throw new NotImplementedException()
+                },
+                _ => throw new NotImplementedException()
+            };
+        }
+
+        public static ulong AddUpPacketVersionNumbers(Packet packet)
         {
             var additional = packet.Value switch
             {
-                Operator op => op.SubPackets.Select(AddUpPacketVersionNumbers).Aggregate(0u, (acc, v) => acc + v),
+                Operator op => op.SubPackets.Select(AddUpPacketVersionNumbers).Aggregate(0ul, (acc, v) => acc + v),
                 _ => 0u
             };
 
@@ -94,7 +117,7 @@ namespace PageOfBob.Advent2021.App.Days
                 return rule(source);
             };
 
-        public static Rule<TToken, TOutput> SubparseByLength<TToken, TOutput>(this Rule<TToken, uint> sizeRule, Rule<TToken, TOutput> ruleToExecute)
+        public static Rule<TToken, TOutput> SubparseByLength<TToken, TOutput>(this Rule<TToken, ulong> sizeRule, Rule<TToken, TOutput> ruleToExecute)
             => (source) => sizeRule(source).Match(
                 fail => fail.Convert<TOutput>(),
                 success =>
@@ -111,7 +134,7 @@ namespace PageOfBob.Advent2021.App.Days
                         });
                 });
 
-        public static Rule<TToken, TOutput[]> SubparseByTimes<TToken, TOutput>(this Rule<TToken, uint> sizeRule, Rule<TToken, TOutput> ruleToExecute)
+        public static Rule<TToken, TOutput[]> SubparseByTimes<TToken, TOutput>(this Rule<TToken, ulong> sizeRule, Rule<TToken, TOutput> ruleToExecute)
             => (source) => sizeRule(source).Match(
                 fail => fail.Convert<TOutput[]>(),
                 success =>
@@ -120,8 +143,8 @@ namespace PageOfBob.Advent2021.App.Days
                     return subRule(success.Next);
                 });
 
-        public static Rule<bool, uint> AsUint(this Rule<bool, bool[]> rule)
-            => rule.Map(b => b.ToUint(b.Length));
+        public static Rule<bool, ulong> AsUlong(this Rule<bool, bool[]> rule)
+            => rule.Map(b => b.ToUlong(b.Length));
 
         public static Rule<T, K[]> Times<T, K>(this Rule<T, K> rule, int times, string? message = null)
             => source =>
@@ -172,7 +195,7 @@ namespace PageOfBob.Advent2021.App.Days
             yield return (index & (1 << 0)) != 0;
         }
 
-        public record Packet(uint Version, IPacketValue Value)
+        public record Packet(ulong Version, IPacketValue Value)
         {
             public override string ToString()
             {
@@ -182,7 +205,7 @@ namespace PageOfBob.Advent2021.App.Days
 
         public interface IPacketValue { }
 
-        public record Literal(uint Value) : IPacketValue
+        public record Literal(ulong Value) : IPacketValue
         {
             public override string ToString()
             {
@@ -190,7 +213,7 @@ namespace PageOfBob.Advent2021.App.Days
             }
         }
 
-        public record Operator(uint TypeId, Packet[] SubPackets) : IPacketValue
+        public record Operator(ulong TypeId, Packet[] SubPackets) : IPacketValue
         {
             public override string ToString()
             {

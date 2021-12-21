@@ -377,3 +377,9 @@ Beyond that, the improved take on Dijkstra's algorithm from part 1 worked quite 
 Fundamentally this is a parsing challenge. Now, it probably would have been faster to just hand-write a simple parser (especially given some of the more dynamic rules), but I wrote a [a little parsing library](https://github.com/mrdrbob/parsing), and I couldn't resist using it for this.
 
 For the most part it worked well. I didn't have anything in the base library that could handle parsing rules that depended on parsed content, but it wasn't too difficult to hack-in (see the `SubparseByLength` and `SubparseByTimes` rules).
+
+## Day 16 - Part 2
+
+The hardest part of Part 2 was my dumb assumption that `uint` should be big enough for anyone. I had to refactor some stuff to use `ulong` instead.
+
+Otherwise, the new C# `switch` pattern matching works great here, where I can match types, values, and use expressions for cases.

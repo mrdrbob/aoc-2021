@@ -71,12 +71,13 @@
                 new Position(position.X, position.Y - 1),
             }.Where(pos => pos.X >= 0 && pos.Y >= 0 && pos.X < width && pos.Y < height);
 
-        public static uint ToUint(this bool[] value, int length)
-            => Enumerable.Range(0, length).Aggregate(0u, (output, position) => value[position] ? output.WithBitSetAtPosition(position, length) : output);
+        public static ulong ToUlong(this bool[] value, int length)
+            => Enumerable.Range(0, length).Aggregate(0ul, (output, position) => value[position] ? output.WithBitSetAtPosition(position, length) : output);
 
-        public static uint WithBitSetAtPosition(this uint value, int position, int length)
-            => value | (1u << (length - position - 1));
+        public static ulong WithBitSetAtPosition(this ulong value, int position, int length)
+            => value | (1ul << (length - position - 1));
 
+        public static uint Sum(this IEnumerable<uint> enumerable) => enumerable.Aggregate(0u, (acc, v) => acc + v);
 
     }
 }
