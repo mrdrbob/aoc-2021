@@ -396,3 +396,12 @@ THEN I take whatever my velocity is and multiply by five. Then that's how many m
 
 This is like calculating pi by throwing hotdogs. Sure, it gets approximately the correct answer, but it's messy and dumb looking.
 
+## Day 17 - Part 2
+
+Part 1 was so ugly I mostly ignored it writing part 2. This time I made a few assumptions and tweaked how I decided what velocities I would try. Then I brute-forced through all the possibilities I thought were realistic.
+
+For X velocities, because the target is always right of 0,0, I start at 1. I try velocities up to the target's farthest vertical edge. If the velocity is more than that, then it will overshoot every time.
+
+For y velocities, it's a little trickier. For my starting velocity, I picked an arbitrary starting point of the most negative horizontal edge multiplied by five. The end velocity is the farthest horizontal edge (inverted, because that's how the y access works), on the same principal as the highest x velocities.
+
+Then I just try every possible combination. I'm sure there are more clever ways to do this, but I'm already several days behind. It works. It's gross. It'll do.

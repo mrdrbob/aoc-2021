@@ -8,6 +8,61 @@ namespace PageOfBob.Advent2021.App.Days
 {
     public static class Day17
     {
+
+        // /*
+        public static void Execute()
+        {
+            // target area: x=211..232, y=-124..-69
+            // You know what? I'm going to be lazy and not parse this.
+            var target = new TargetArea(new Range(211, 232), new Range(-124, -69));
+            // Example data
+            // var target = new TargetArea(new Range(20, 30), new Range(-10, -5));
+
+            // bool t = Simulate2(target, new Vector(0, 7), new Vector(0, -1));
+
+            var matching = FindAllTargetVelocities(target);
+            /*
+            foreach (var match in matching)
+                Console.WriteLine("{0},{1}", match.X, match.Y);
+            */
+
+            Console.WriteLine(matching.Count());
+        }
+        // */
+
+        public static IEnumerable<(int X, int Y)> FindAllTargetVelocities(TargetArea target)
+        {
+            for (var xVel = 1; xVel <= target.X.End; xVel++)
+            {
+                for (var yVel = target.Y.Start * 5; yVel <= -target.Y.Start; yVel++)
+                {
+                    var result = Simulate2(target, new Vector(0, xVel), new Vector(0, yVel));
+                    if (result)
+                        yield return (xVel, yVel);
+                }
+            }
+        }
+
+        public static bool Simulate2(TargetArea target, Vector x, Vector y)
+        {
+            while (true)
+            {
+                // Console.WriteLine("{0}, {1}", x.Position, y.Position);
+
+                bool isInTarget = target.IsWithin(x, y);
+                if (isInTarget)
+                    return true;
+
+                bool overShot = target.Overshot(x, y);
+                if (overShot)
+                    return false;
+
+                x = x.Drag();
+                y = y.Gravity(-1);
+            }
+        }
+
+        /* Part 1
         public static void Execute()
         {
             // target area: x=211..232, y=-124..-69
@@ -52,7 +107,7 @@ namespace PageOfBob.Advent2021.App.Days
 
             Console.WriteLine(lastHighest);
         }
-
+        // */
 
         public static int? Simulate(TargetArea target, Vector x, Vector y)
         {
@@ -64,7 +119,10 @@ namespace PageOfBob.Advent2021.App.Days
 
                 bool isInTarget = target.IsWithin(x, y);
                 if (isInTarget)
+                {
+                    Console.WriteLine(y.Velocity);
                     return maxY;
+                }
 
                 bool overShot = target.Overshot(x, y);
                 if (overShot)
@@ -105,7 +163,7 @@ namespace PageOfBob.Advent2021.App.Days
             public bool IsWithin(Vector x, Vector y) => IsWithin(x.Position, y.Position);
             public bool Overshot(Vector x, Vector y)
             {
-                if (y.Velocity < 0 && y.Position < Y.End)
+                if (y.Velocity < 0 && y.Position < Y.Start)
                     return true;
 
                 if (x.Velocity < 0 && x.Position < X.End)
