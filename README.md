@@ -405,3 +405,93 @@ For X velocities, because the target is always right of 0,0, I start at 1. I try
 For y velocities, it's a little trickier. For my starting velocity, I picked an arbitrary starting point of the most negative horizontal edge multiplied by five. The end velocity is the farthest horizontal edge (inverted, because that's how the y access works), on the same principal as the highest x velocities.
 
 Then I just try every possible combination. I'm sure there are more clever ways to do this, but I'm already several days behind. It works. It's gross. It'll do.
+
+## Day 18 - Part 1
+
+Well, it's 2022 and I didn't get all the challenges done by end-of-year. That's life. I love Advent of Code, but late December is the worst time of year to take on extra circular activities.
+
+But I'd still like to take a stab at completing the year. So on to day 18!
+
+So I decided to take my input and build a tree structure to represent the data, though when I got into the weeds on this, I doubted my decision. The hardest part for me was finding the node immediately to the "left" or "right" of any given node.
+
+Let's take a look at an example:
+
+`[[7,[5,6]],9]`
+
+As tree, it looks something like this:
+
+```
+           A
+          / \
+         B   9
+        / \
+       7   C
+          / \
+         5   6
+```
+
+Pairs are represented as letters here here. `A` is the "root" pair.
+
+Let's say we were going to explode the `C` pair. Step one is to find the path to that pair. I do this recursively, left/depth first. Start at the root node, then follow this pattern:
+
+1. Is this the node I'm looking for? If so, return it as a list of one item (other nodes will add themselves to this list as the stack unwinds).
+2. Is this node a pair? If it's not, then it's not the node we want, return null.
+3. So this is a pair. Recurse on the left branch first. Did that return something other than null? If so, add myself to the list and return that.
+4. If the left branch didn't find it, recurse on the right. If that's non-null, add myself to the list and return that.
+5. Otherwise, return null.
+
+Once you've followed the process, you should get a list of nodes that represent the path, something like: `C, B, A`. That's helpful, but we'll also need to track which direction the path traversed. So tweak our algorithm to also track if it was a left or right branch, it becomes: `(C | None), (B | Right), (A | Left)`. Reading that backwards, we know we branched left at `A`, right at `B`, and `C` was our destination (no branching).
+
+We have the node and we have the path to the node (including which side of each branch). How do we figure out the next item on the "left" or "right" of any particular node?
+
+To figure out what's left of `C`, we need to know it's parent node, and which side `C` was on. We know the parent node is `B`, and `C` is on the Right side of `B`. So we can start our search on the *left* side of `B`, which is a value node of 7. So 7 is to the left of `C` (and `5` for that matter).
+
+The right of `C` is a little more complicated. We need to traverse back up the path until we find a node where we traversed *left*. That node would be `A`. Now we can start looking on the *right* side of `A`. In this simple example, it's a value node, `9`.
+
+Let's make the same example slightly more complicated:
+
+```
+             A
+          /     \
+         B       D
+        / \     / \
+       7   C   1   2
+          / \
+         5   6
+```
+
+All I've done is change `9` into `D` with two value nodes.
+
+So, to find what's right of `C`, we traverse back to `A` (the first node in our history that traversed left). We look at the right branch of `A` and it's a pair, so we have to keep looking. We then recursively traverse all the left branches until we find a value, in this case, `1`.
+
+So in general, to find something to the *right* of a node:
+
+1. Traverse back *down* the path to the selected node until you find a node where your branched *left*.
+2. From that node, start on the *right* branch. If it's a value, you're done. Otherwise, traverse all the *left* nodes until you've found a value.
+
+The same is true of the left side of a node, but with the directions reversed.
+
+Now we can find nodes that are "left of" or "right of" a given node. For exploding, we just add the values to those nodes (if any node is found, of course), and then convert the node in question (`C` in our example), to a value node, with a value of 0. For the more complicated example, it would end up:
+
+```
+             A
+          /     \
+         B       D
+        / \     / \
+      12   0   7   2
+```
+
+Splitting a node is much simpler, IMO. We just convert the node that's too large into a pair, and add on two appropriate value nodes. Splitting `12`, for example:
+
+```
+             A
+          /     \
+         B       D
+        / \     / \
+       E   0   7   2
+      / \
+     6   6
+```
+
+Finally, the explode and split methods need to return whether or not any changes were made. Then we can iterate until both methods return false.
+
