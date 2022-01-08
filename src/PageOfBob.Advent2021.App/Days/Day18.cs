@@ -29,22 +29,13 @@ namespace PageOfBob.Advent2021.App.Days
 
         public static void Execute()
         {
-            /*
-            var root = Parse("[[[[4,3],4],4],[7,[[8,4],9]]]");
-            var add = Parse("[1,1]");
 
-            var node = root.Add(add);
-            Console.WriteLine(node);
-            node.FullyReduce();
-            Console.WriteLine(node)
-            // */
-
-
-            // /*
             // Parse the input
             var input = Utilities.GetEmbeddedData("18").Lines();
             var parsedInput = input.Select(Parse).ToList();
 
+
+            /* Part 1
             // Now process
             var root = parsedInput.First();
             foreach (var node in parsedInput.Skip(1))
@@ -58,7 +49,30 @@ namespace PageOfBob.Advent2021.App.Days
             Console.WriteLine(root.Magnitude());
             // */
 
+            ulong? maxMagnitude = null;
+            for (var x = 0; x < parsedInput.Count; x++)
+            {
+                for (var y = 0; y < parsedInput.Count; y++)
+                {
+                    if (x == y)
+                        continue;
+
+                    var node = parsedInput[x].Add(parsedInput[y]).Clone();
+                    node.FullyReduce();
+                    var magnitude = node.Magnitude();
+                    if (!maxMagnitude.HasValue || magnitude > maxMagnitude.Value)
+                        maxMagnitude = magnitude;
+                }
+            }
+
+            Console.WriteLine(maxMagnitude);
+
         }
+
+        private static Node Clone(this Node node)
+            => node.Match(
+                v => Node.ValueNode(v),
+                (left, right) => Node.PairNode(left.Clone(), right.Clone()));
 
         private static ulong Magnitude(this Node node)
             => node.Match(

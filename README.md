@@ -495,3 +495,10 @@ Splitting a node is much simpler, IMO. We just convert the node that's too large
 
 Finally, the explode and split methods need to return whether or not any changes were made. Then we can iterate until both methods return false.
 
+## Day 18 - Part 2
+
+Part two is applying the stuff you've built to the set of possible combinations. I did this with nested loops. There are a couple keys to this part:
+
+1. As the instructions state, adding is not commutative, so A + B ≠ B + A. So we have to try all permutations. I did this by not limiting my inner loop to only the items "past" the one the outer loop is referencing.
+2. You can't add a number to itself. In my nested loops, I just verify that the outer and inner loop aren't pointing at the same index.
+3. If you're using mutable trees and don't create clones, the reductions will effect later results. I create clone copies of each tree prior to reducing.
