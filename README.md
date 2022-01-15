@@ -502,3 +502,98 @@ Part two is applying the stuff you've built to the set of possible combinations.
 1. As the instructions state, adding is not commutative, so A + B ≠ B + A. So we have to try all permutations. I did this by not limiting my inner loop to only the items "past" the one the outer loop is referencing.
 2. You can't add a number to itself. In my nested loops, I just verify that the outer and inner loop aren't pointing at the same index.
 3. If you're using mutable trees and don't create clones, the reductions will effect later results. I create clone copies of each tree prior to reducing.
+
+## Day 19 - Part 1
+
+Oof. This one nearly broke me. But on the *fifth* attempt, I got it.
+
+First, let's talk about strategy at a broad level, by taking a much smaller example and dropping the third dimension. Instead, let's have two scanners with three beacons each on a 2D plane. Assume the scanners overlap completely and we just need to figure out the rotation and offset. Let's call the scanners Left and Right, and start with them already rotated correctly. Left sees the numbered beacons, and Right sees the alphabetical beacons.
+
+```
+0 .......
+1 .1.....
+2 .2.3...
+3 .......
+4 ...A...
+5 ...B.C.
+6 .......
+  0123456
+```
+
+As a human, I look at this and immediate recognize that it's the same pattern, just offset. But how do I figure that out programmatically? Think about the *delta* between the beacons in the Left scanner and the Right scanner. Take the delta between `1` and `A`: `(1,1) - (3,4)`, or `(-2,-3)`, for example.
+
+If the pattern is the same, and they're oriented the same, then the beacons that overlap should all be the same delta from each other. That's something we can test. First we calculate the delta between all the points:
+
+| Pts   | Coordinates   | Delta    |
+| ----- | ------------- | -------- |
+| 1 - A | (1,1) - (3,4) | (-2, -3) |
+| 1 - B | (1,1) - (3,5) | (-2, -4) |
+| 1 - C | (1,1) - (5,5) | (-4, -4) |
+| 2 - A | (1,2) - (3,4) | (-2, -2) |
+| 2 - B | (1,2) - (3,5) | (-2, -3) |
+| 2 - C | (1,2) - (5,5) | (-4, -3) |
+| 3 - A | (3,2) - (3,4) | ( 0, -2) |
+| 3 - B | (3,2) - (3,5) | ( 0, -3) |
+| 3 - C | (3,2) - (5,5) | (-2, -3) |
+
+Now lets look at how frequently each delta appears:
+
+| Delta    | Frequency |
+| -------- | --------- |
+| (-2, -3) | 3         |
+| (-2, -4) | 1         |
+| (-4, -4) | 1         |
+| (-2, -2) | 1         |
+| (-4, -3) | 1         |
+| ( 0, -2) | 1         |
+| ( 0, -3) | 1         |
+
+So we have a delta that appears 3 times and we know we have 3 beacons that should match. It's *very* likely we found the correct offset. We can translate the Right scanner's beacons by that delta and see where we come out:
+
+| Right Beacon | With offset       | Translated | Matches Left Beacon |
+| ------------ | ----------------- | ---------- | ------------------- |
+| A            | (3, 4) + (-2, -3) | (1, 1)     | Yes, 1.             |
+| B            | (3, 5) + (-2, -3) | (1, 2)     | Yes, 2.             |
+| C            | (5, 5) + (-2, -3) | (3, 2)     | Yes, 3.             |
+
+So with an offset of `(-2, -3)`, all of the beacons align to another beacon. We got it. You can apply this idea to 3D space as well, just add another dimension to your calculations.
+
+So that solves the offset problem. What about orientation? The instructions specifically mention 24 possible orientations, but I, for one, don't work with coordinates much and didn't know off the top of my head how to arrive at those orientations, or how to translate beacons to match those orientations.
+
+So here's how I thought about it, back in 3D space: Imagine a six-sided die sitting on a table in front of you. The 1 is facing up (away from the table, looking at the sky, so to speak). In this position, depending on rotation, either 2, 3, 4, or 5 is facing you. So for the orientation of 1 facing up, there are 4 rotations. If 2 is facing up, then either 1, 3, 4, or 6 is facing you--again 4 rotations. So extrapolating, there are 6 sides that can face up, and each of those positions can be rotated 4 ways--thus 24 possible orientations.
+
+Ok, but how do we figure out a formula for orienting points for those 24 possible orientations? Well, I did it in two steps.
+
+First, I need to know how to translate the positions such a different side that is facing "up". Up is totally arbitrary here, but having a fixed direction in mind helps to reason about it. I did this by (very crudely) folding a piece of paper into a cube. I set the cube before me and wrote +Z on the side facing up, +X on the side to my left, and +Y on the side facing away from me (these axes were also arbitrary). Then on the opposite side for each letter, I wrote the negative of that letter. So the opposite side of +X was -X, +Y to -Y, etc. I labeled the side facing up (+Z) "0", and wrote it down. I'm using the side to my left as "X", facing away from me as "Y", and up as "Z".
+
+`Position 0 = +X, +Y, +Z`
+
+I then turned the cube so the +X side was facing up. I arbitrarily labeled this side "1". Now -Z was on the left side, +Y faced away, and +X was up.
+
+`Position 1 = -Z, +Y, +X`
+
+And then repeated for the remaining sides. These became my direction orientation step. The numbers I used as labels are not important (because I'm just trying all possible orientations), but the set of six +/- X/Y/Z values become my algorithm.
+
+So if want to translate a point for position 1, I use it's -Z value as X, +Y as Y, and +X as Z. Something like:
+
+`var position1Translated = new Point { X = -pt.Z, Y = pt.Y, Z = pt.X };`
+
+Part two of this is rotation. I did basically the same thing. First, I oriented the cube so that +X was to my left, +Y faced away, +Z was up. That's rotation 0.
+
+`Rotation 0 = +X, +Y, +Z`
+
+Then I turned it once counter-clockwise. Now +Y was to my left, -X faced away, and +Z remained on top. (I'm rotating on the Z access, so it always stays on top)
+
+`Rotation 1 = +Y, -X, +Z`
+
+Repeat two more times, and that's your algorithm for rotation. For the complete orientation, I apply the direction, and then the rotation.
+
+So finally, I combine these ideas into a single algorithm, which is (roughly speaking):
+
+1. Take the first scanner and consider it solved. This gives me a global, solved space to match everything else against.
+2. Loop through all possible orientations, and for each, loop through the unsolved scanners. Calculate the deltas of between all the beacons in the unsolved scanner and the solved global space.
+3. For all the deltas that came up at least 12 times, translate all the beacons by that delta and check for matches in the global solved space. If at least 12 beacons still match, then consider that a solve.
+4. Remove the solved scanner from the list of unsolved scanners. Add all of it's beacons (translated) into the solved space. Because I'm using a set, duplicates are naturally ignored.
+5. Repeat until all unsolved scanners are solved.
+
+The set of solved scanners gives me my count.
