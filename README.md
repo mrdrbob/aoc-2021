@@ -597,3 +597,13 @@ So finally, I combine these ideas into a single algorithm, which is (roughly spe
 5. Repeat until all unsolved scanners are solved.
 
 The set of solved scanners gives me my count.
+
+## Day 19 - Part 2
+
+Part two required a couple small tweaks. First, we need to keep track of the solved scanners' final positions. Luckily, each scanner's position relative to the world origin (0,0,0) is just the offset we figured out for that scanner. So I keep track of each offset, which is also that scanner's position relative to the global solved space.
+
+Then we calculate the manhattan distance between all the scanners, looking for the largest one. To get the manhattan distance, I take the delta, then add the absolute value of each coordinate of the delta together.
+
+In retrospect, I should have named my `Beacon` type something more generic, like `Vector3` or something. It really stood out when I wrote: `knownScanners.Add(new Beacon(0, 0, 0));` -- Why am I adding a beacon to a list of scanners? I'm not. I'm adding a *position* to a list of scanner *positions*. I also use `Beacon` to represent the difference between two points. I'm surprised I don't find a way to store XML in a `Beacon` while I was at it.
+
+Anyway, too lazy to fix.

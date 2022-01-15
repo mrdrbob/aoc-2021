@@ -26,6 +26,14 @@ namespace PageOfBob.Advent2021.App.Days
             var solved = scanners.First().Beacons.ToHashSet();
             var unsolved = scanners.Skip(1).ToList();
 
+            // For part 2, we also keep track of scanner positions.
+            // Using a list of "beacons", but really, we're just using them
+            // as points.
+            var knownScanners = new List<Beacon>();
+            // The first scanner is always at the origin, as this scanner is the basis for
+            // our global solved space.
+            knownScanners.Add(new Beacon(0, 0, 0));
+
             while (unsolved.Any())
             {
                 Console.WriteLine($"Solved beacons: {solved.Count}, Unsolved scanners: {unsolved.Count}");
@@ -64,12 +72,38 @@ namespace PageOfBob.Advent2021.App.Days
                             unsolved.Remove(scanner);
                             foreach (var translated in translatedBeacons)
                                 solved.Add(translated);
+
+                            // Translate the scanner into the appropriate place. We don't care about
+                            // orientation here, so just use the offset. Save it in the list.
+                            var translatedScannerPosition = new Beacon(0, 0, 0).Translate(offset);
+                            knownScanners.Add(translatedScannerPosition);
                         }
                     }
                 }
             }
 
             Console.WriteLine($"Solved beacons: {solved.Count}, Unsolved scanners: {unsolved.Count}");
+
+            // Now we just compare all the scanners distances to each other and find the largest one.
+            int? largestDistance = null;
+            for (int x = 0; x < knownScanners.Count; x++)
+            {
+                // var y = x + 1 so we're not doing the same comparisons twice.
+                for (var y = x + 1; y < knownScanners.Count; y++)
+                {
+                    var distance = knownScanners[x].Delta(knownScanners[y]).AsManhattanDistance();
+                    if (!largestDistance.HasValue || distance > largestDistance.Value)
+                        largestDistance = distance;
+                }
+            }
+
+            // Or you could do this.
+            // var maxDistance = Enumerable.Range(0, knownScanners.Count)
+            //    .SelectMany(x => Enumerable.Range(x + 1, knownScanners.Count - x - 1)
+            //        .Select(y => knownScanners[x].Delta(knownScanners[y]).AsManhatanDistance())
+            //    ).Max();
+
+            Console.WriteLine($"Largest distance between scanners is: {largestDistance} ");
         }
 
         public static Dictionary<Beacon, int> CountMatchingDeltas(IEnumerable<Beacon> one, IEnumerable<Beacon> two)
@@ -141,5 +175,8 @@ namespace PageOfBob.Advent2021.App.Days
 
         public static Beacon Translate(this Beacon one, Beacon two)
             => new Beacon(one.X + two.X, one.Y + two.Y, one.Z + two.Z);
+
+        public static int AsManhattanDistance(this Beacon beacon)
+            => Math.Abs(beacon.X) + Math.Abs(beacon.Y) + Math.Abs(beacon.Z);
     }
 }
