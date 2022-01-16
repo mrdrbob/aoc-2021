@@ -607,3 +607,33 @@ Then we calculate the manhattan distance between all the scanners, looking for t
 In retrospect, I should have named my `Beacon` type something more generic, like `Vector3` or something. It really stood out when I wrote: `knownScanners.Add(new Beacon(0, 0, 0));` -- Why am I adding a beacon to a list of scanners? I'm not. I'm adding a *position* to a list of scanner *positions*. I also use `Beacon` to represent the difference between two points. I'm surprised I don't find a way to store XML in a `Beacon` while I was at it.
 
 Anyway, too lazy to fix.
+
+## Day 20 - Part 1
+
+This one threw me a wrinkle with the non-example input. I'm guessing it did for everyone. Remember that the field is infinite. So in the example input, out in the deep expanse of the infinite, there's a place that looks like this:
+
+```
+.........
+..[...]..
+..[...]..
+..[...]..
+.........
+```
+
+That 9x9 area calculates to index `0`. The example algorithm starts with : `..#.#..####`. So void spaces stay dark.
+
+*My* algorithm started with: `#.#.....`. So that means that infinite void of darkness would all go **bright** on the first step. So then it would look like:
+
+```
+#########
+##[###]##
+##[###]##
+##[###]##
+#########
+```
+
+That calculates out to index `256`, which in my algorithm turns it all **dark**. 
+
+In other words, the space around what you're looking at is flipping on and off for my algorithm (and likely yours too, if you're playing at home).
+
+So the solution (for me) is admittedly lazy. I consider the bounds of my problem, and assume any point outside of my bounds is dark for odd steps (first, third), and bright on event steps (second). Further, I expand the area I'm looking at by 1 in all directions on each iteration.
