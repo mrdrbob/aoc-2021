@@ -637,3 +637,7 @@ That calculates out to index `256`, which in my algorithm turns it all **dark**.
 In other words, the space around what you're looking at is flipping on and off for my algorithm (and likely yours too, if you're playing at home).
 
 So the solution (for me) is admittedly lazy. I consider the bounds of my problem, and assume any point outside of my bounds is dark for odd steps (first, third), and bright on event steps (second). Further, I expand the area I'm looking at by 1 in all directions on each iteration.
+
+## Day 20 - Part 2
+
+My part one solution worked as-is for part two, just updated it to run 50 times.

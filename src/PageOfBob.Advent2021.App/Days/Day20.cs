@@ -12,15 +12,19 @@
 
             var world = new BoundingRectangle(new Range(0, 100), new Range(0, 100));
 
-
             var field = new Field(lightPoints, world, 1);
             // field.Print();
 
+            /* Part 1
             field = field.Enhance(algorithm);
             // field.Print();
 
             field = field.Enhance(algorithm);
             // field.Print();
+            */
+
+            for (var x = 0; x < 50; x++)
+                field = field.Enhance(algorithm);
 
             Console.WriteLine(field.Points.Count);
         }
