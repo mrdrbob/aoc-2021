@@ -641,3 +641,7 @@ So the solution (for me) is admittedly lazy. I consider the bounds of my problem
 ## Day 20 - Part 2
 
 My part one solution worked as-is for part two, just updated it to run 50 times.
+
+## Day 21 - Part 1
+
+I suspect part 2 is where the puzzle begins on this one. Part 1 is mostly a matter of following directions. I can only hope that the way I modeled part 1 is somewhat useful for whatever changes I will have to make for part 2.
