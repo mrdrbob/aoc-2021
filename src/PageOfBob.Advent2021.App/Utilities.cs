@@ -62,6 +62,24 @@
             where T : notnull
             => dictionary[key] = dictionary.TryGetValue(key, out ulong existingValue) ? existingValue + (amount.HasValue ? amount.Value : 1) : (amount.HasValue ? amount.Value : 1);
 
+        public static Dictionary<T, int> CountFrequency<T>(this IEnumerable<T> values)
+            where T : notnull
+        {
+            var counter = new Dictionary<T, int>();
+            foreach (var value in values)
+                counter.Plus(value);
+            return counter;
+        }
+
+        public static Dictionary<T, ulong> CountFrequencyUlong<T>(this IEnumerable<T> values)
+            where T : notnull
+        {
+            var counter = new Dictionary<T, ulong>();
+            foreach (var value in values)
+                counter.Plus(value);
+            return counter;
+        }
+
         public static IEnumerable<Position> GetOrdinalPositions(this Position position, int width, int height)
             => new[]
             {

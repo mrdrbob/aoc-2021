@@ -645,3 +645,57 @@ My part one solution worked as-is for part two, just updated it to run 50 times.
 ## Day 21 - Part 1
 
 I suspect part 2 is where the puzzle begins on this one. Part 1 is mostly a matter of following directions. I can only hope that the way I modeled part 1 is somewhat useful for whatever changes I will have to make for part 2.
+
+## Day 21 - Part 2
+
+Part two reminds me of [Day 6](#day-6---part-2). My modeling didn't work very well here, since I put the game logic into individual models and made everything mutable. For part two, it was easier to use immutable models, with value equality instead of reference equality, with the logic separate from the models. Further, in part 1 made the game agnostic to the number of players or the type of die, both of which turned out useless. *Sigh.* "You ain't gonna need it."
+
+Anyway, instead of modelling individual games, I had to think of it in terms of how many universes were there for each possible game state. Similar to day 6, where we modeled the population of fish, rather than the individual fish.
+
+Think of it this way. The initial example `(4, 0) and (8, 0)` occurs in exactly one universe. What happens when player one rolls the die? That universe diverges by all the possible outcomes of rolling a 3-sided die three times.
+
+So what are all those possible outcomes? Well, the raw outcomes are:
+
+| Die     | roll    | outcomes  |
+| ------- | ------- | --------- |
+| 1, 1, 1 | 2, 1, 1 | 3, 1, 1   |
+| 1, 1, 2 | 2, 1, 2 | 3, 1, 2   |
+| 1, 1, 3 | 2, 1, 3 | 3, 1, 3   |
+| 1, 2, 1 | 2, 2, 1 | 3, 2, 1   |
+| 1, 2, 2 | 2, 2, 2 | 3, 2, 2   |
+| 1, 2, 3 | 2, 2, 3 | 3, 2, 3   |
+| 1, 3, 1 | 2, 3, 1 | 3, 3, 1   |
+| 1, 3, 2 | 2, 3, 2 | 3, 3, 2   |
+| 1, 3, 3 | 2, 3, 3 | 3, 3, 3   |
+
+Or 27 possibilities. But we're adding up the results of those rolls, and there will be duplicates. So rather than worrying about the individual rolls, let's look at the totals:
+
+| Die     | roll    | totals    |
+| ------- | ------- | --------- |
+| 3       | 4       | 5         |
+| 4       | 5       | 6         |
+| 5       | 6       | 7         |
+| 4       | 5       | 6         |
+| 5       | 6       | 7         |
+| 6       | 7       | 8         |
+| 5       | 6       | 7         |
+| 6       | 7       | 8         |
+| 7       | 8       | 9         |
+
+Count up the frequencies of each total and you get:
+
+| Total | Times Appeared |
+| ----- | -------------- |
+| 3     | 1              |
+| 4     | 3              |
+| 5     | 6              |
+| 6     | 7              |
+| 7     | 6              |
+| 8     | 3              |
+| 9     | 1              |
+
+So effectively, there are seven possible outcomes, most of which occur multiple times. The `3` outcome will occur once, the `4` outcome will occur three times, etc. Thus splintering into that number of universes.
+
+So for player one's first roll, we splinter into seven possible outcomes. The first outcome (rolls a `3`) occurs in one universe, the second output (rolls a `4`) occurs in three universes, etc. If the player wins on that roll, then we can track that. Otherwise, we move on to player two, and go through all seven possible outcomes for player two. If any of those win, we can track that. Otherwise, we end up with new game states and universe counts for those game states. We track those and iterate on the list until all possible game states have ended.
+
+That's the broad idea anyway. For a more detailed explanation, it's probably better to read the code.
