@@ -69,7 +69,7 @@ namespace PageOfBob.Advent2021.App.Days
             }
 
             var totalSize = onCuboids
-                .Select(c => c.Constrain(worldConstraint))
+                // .Select(c => c.Constrain(worldConstraint))
                 .Where(c => !c.IsEmpty())
                 .Select(x => x.Size()).Sum();
             Console.WriteLine(totalSize);
@@ -92,7 +92,7 @@ namespace PageOfBob.Advent2021.App.Days
 
         private record struct Range(int Min, int Max);
 
-        private static int Size(this Range self) => self.Max - self.Min + 1;
+        private static long Size(this Range self) => self.Max - self.Min + 1;
 
         private static bool Overlaps(this Range self, Range other)
             => !(other.Min > self.Max || other.Max < self.Min);
@@ -130,7 +130,7 @@ namespace PageOfBob.Advent2021.App.Days
             return self.Split(other).Where(x => !x.IsEmpty());
         }
 
-        private static int Size(this Cube self) => self.Width.Size() * self.Height.Size() * self.Depth.Size();
+        private static long Size(this Cube self) => self.Width.Size() * self.Height.Size() * self.Depth.Size();
 
         private static Cube Constrain(this Cube self, Cube constraint)
             => new Cube(self.Width.Constrain(constraint.Width), self.Height.Constrain(constraint.Height), self.Depth.Constrain(constraint.Depth));

@@ -844,3 +844,7 @@ Once you have subtraction figured out, each step becomes either:
 2. Off: Subtract the space where the new cuboids would be.
 
 Once that's done, calculating the total number of cuboids is a matter of summing up the total area of all the cubes of space.
+
+## Day 22 - Part 2
+
+A 32-bit integer should be enough for anybody! But in this case, a 64-bit integer was required. Beyond removing the constraint and making my area calculation use a larger numeric size, my solution worked as-is.
