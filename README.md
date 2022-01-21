@@ -699,3 +699,148 @@ So effectively, there are seven possible outcomes, most of which occur multiple 
 So for player one's first roll, we splinter into seven possible outcomes. The first outcome (rolls a `3`) occurs in one universe, the second output (rolls a `4`) occurs in three universes, etc. If the player wins on that roll, then we can track that. Otherwise, we move on to player two, and go through all seven possible outcomes for player two. If any of those win, we can track that. Otherwise, we end up with new game states and universe counts for those game states. We track those and iterate on the list until all possible game states have ended.
 
 That's the broad idea anyway. For a more detailed explanation, it's probably better to read the code.
+
+## Day 22 - Part 1
+
+It may be possible to solve part one by tracking each individual point in the cuboid space, especially considering the -50 to +50 constraint on all axes, but this late in the challenge, one can generally assume that naive solutions will only work for part one.
+
+Rather, I ended up thinking about it as partitioning space, where swathes of space are either turned on, or off. Well, because off is the default state of everything, I really only need to care about spaces that are on. So the the question becomes what to do when two on states overlap. For example, in 2D space:
+
+```
++---------+
+|         |
+|         |
+|     +---|----+
+|     |   |    |
++---------+    |
+      |        |
+      +--------+
+```
+
+These commands overlap and create: 
+
+```
++---------+
+|         |
+|         |
+|         +----+
+|              |
++-----+        |
+      |        |
+      +--------+
+```
+
+But that irregular shape is hard to reason about, hard to calculate the area of, and hard to do boolean operations on. I'd rather keep everything in as rectangles. Well, this shape can be made of rectangles:
+
+
+```
++-----+---+
+|     |   |
+|     |   |
+|     +---+----+
+|     |        |
++-----+        |
+      |        |
+      +--------+
+```
+
+Now instead of tracking shapes, we're tracking rectangles. My set of rectangles can represent all the points that are currently turned on.
+
+But how do we arrive at this shape? How do we decide how to do the splits. Let's take a worst-case scenario where we need to punch a whole in a rectangle, again in 2D space:
+
+```
++----------------+
+|                |
+|                |
+|    +----+      |
+|    |    |      |
+|    |    |      |
+|    +----+      |
+|                |
+|                |
++----------------+
+```
+
+The inner rectangle is being subtracted from the outer. How do we split that up? First we remove the outer rectangle, then rebuild the remaining parts, one side at a time. Start with the left side:
+
+```
++---+
+|   |
+|   |
+|   |+----+
+|   ||    |
+|   ||    |
+|   |+----+
+|   |
+|   |
++---+
+```
+
+This new box is the original outer box's full height, and the width is the outer box's min X to the inner box's min y - 1. We can do the same for the right side:
+
+```
++---+      +-----+
+|   |      |     |
+|   |      |     |
+|   |+----+|     |
+|   ||    ||     |
+|   ||    ||     |
+|   |+----+|     |
+|   |      |     |
+|   |      |     |
++---+      +-----+
+```
+
+This new side is the full height again, and the width is the inner box's max X + 1, to the outer box's max x. Fill in the top next:
+
+```
++---++----++-----+
+|   ||    ||     |
+|   |+----+|     |
+|   |+----+|     |
+|   ||    ||     |
+|   ||    ||     |
+|   |+----+|     |
+|   |      |     |
+|   |      |     |
++---+      +-----+
+```
+
+This time the width is the inner box's width (actually, it's the width of the outer box constrained by the inner box, which in this scenario happens to end up being the inner box's width). The height is the outer box's min Y to the inner box's min Y + 1. We do the last side:
+
+```
++---++----++-----+
+|   ||    ||     |
+|   |+----+|     |
+|   |+----+|     |
+|   ||    ||     |
+|   ||    ||     |
+|   |+----+|     |
+|   |+----+|     |
+|   ||    ||     |
++---++----++-----+
+```
+
+Similarly, it's the inner box's width, and the height is the inner box's max Y + 1 to the outer box's max Y. Because this is subtraction, the final result becomes:
+
+```
++---++----++-----+
+|   ||    ||     |
+|   |+----+|     |
+|   |      |     |
+|   |      |     |
+|   |      |     |
+|   |      |     |
+|   |+----+|     |
+|   ||    ||     |
++---++----++-----+
+```
+
+Four final boxes. You can play around with other scenarios to find edge cases. Ultimately, I generalized the idea to calculate the potential box for each side, and then remove it if the resulting box took up zero or negative space (which happens when the box being subtracted isn't fully contained by the outer box). Then extend this to another dimension for the cuboids.
+
+Once you have subtraction figured out, each step becomes either:
+
+1. On: Subtract the space where the new cuboids would be, and then add an "on" region in the resulting space.
+2. Off: Subtract the space where the new cuboids would be.
+
+Once that's done, calculating the total number of cuboids is a matter of summing up the total area of all the cubes of space.
