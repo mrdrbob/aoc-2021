@@ -97,5 +97,21 @@
 
         public static uint Sum(this IEnumerable<uint> enumerable) => enumerable.Aggregate(0u, (acc, v) => acc + v);
 
+        public static bool Is<T>(this T? nullable, T possibleValue) where T : struct
+        {
+            if (!nullable.HasValue)
+                return false;
+            return nullable.Value.Equals(possibleValue);
+        }
+
+        public static IEnumerable<T> WithValue<T>(this IEnumerable<T?> nullable) where T : struct
+        {
+            foreach (var t in nullable)
+            {
+                if (t.HasValue)
+                    yield return t.Value;
+            }
+        }
+
     }
 }

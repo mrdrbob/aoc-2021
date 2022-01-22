@@ -848,3 +848,12 @@ Once that's done, calculating the total number of cuboids is a matter of summing
 ## Day 22 - Part 2
 
 A 32-bit integer should be enough for anybody! But in this case, a 64-bit integer was required. Beyond removing the constraint and making my area calculation use a larger numeric size, my solution worked as-is.
+
+## Day 23 - Part 1
+
+There was quite a bit to this one. Here are my key takeaways:
+
+1. Simplify the problem. I tried a few ways to represent the "state" of the world. I had a binary map, I had nodes in a connected graph, all kinds of terrible ideas. I settled on just keeping track of each Amphipod (which I took to calling pods because I kept mistyping amphipod), and representing them as a "location" (basically the X axis), and a "depth" (basically the Y axis). If depth was zero, the pod was in the hallway, otherwise it was in a room. Rooms were at locations 2, 4, 6, and 8, and had possible depth of two. The rules allowed for a pod to leave a room and enter a room in the same "turn", but it didn't change the cost, so I assumed that any movement was either from a room to the hallway, or from the hallway to a room.
+2. To find a solve, I basically shoe-horned Dijkstra's algorithm, and probably not in the most efficient way. I treated each possible state as a "node" in a graph, then keep looking at the shortest paths until I found a state in which the game is won. It probably would have been smarter to apply some heuristics to more intelligently chose the "short" paths (in other words, use A*), but it ran in a reasonable amount of time. I calculate the possible states and costs of those states based on the current state of the node I'm "visiting" in the algorithm.
+3. Calculating each possible state is largely an exercise in paying very close attention to the rules.
+4. Because I'm representing state as an array of Pods, and I wanted to use a dictionary to lookup if a given state had been found before (and at a lower cost), and because arrays in C# use reference identity, I had to create an `IEqualityComparer<>` implementation for my state structure, otherwise no two states (even if their values were identical) would ever match as a key. 
