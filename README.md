@@ -857,3 +857,9 @@ There was quite a bit to this one. Here are my key takeaways:
 2. To find a solve, I basically shoe-horned Dijkstra's algorithm, and probably not in the most efficient way. I treated each possible state as a "node" in a graph, then keep looking at the shortest paths until I found a state in which the game is won. It probably would have been smarter to apply some heuristics to more intelligently chose the "short" paths (in other words, use A*), but it ran in a reasonable amount of time. I calculate the possible states and costs of those states based on the current state of the node I'm "visiting" in the algorithm.
 3. Calculating each possible state is largely an exercise in paying very close attention to the rules.
 4. Because I'm representing state as an array of Pods, and I wanted to use a dictionary to lookup if a given state had been found before (and at a lower cost), and because arrays in C# use reference identity, I had to create an `IEqualityComparer<>` implementation for my state structure, otherwise no two states (even if their values were identical) would ever match as a key. 
+
+## Day 23 - Part 2
+
+Luckily, most of my algorithm wasn't too hard to adapt to additional room depth. Just changing a few instances of `2` to `MaxRoomDepth` and another couple minor adjustments, and the algorithm worked.
+
+I admit, though, that I just updated my input rather than inject two additional lines at runtime like I'm supposed'ta.

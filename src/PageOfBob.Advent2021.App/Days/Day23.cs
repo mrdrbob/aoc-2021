@@ -4,13 +4,15 @@ namespace PageOfBob.Advent2021.App.Days
 {
     public static class Day23
     {
+        public const int MaxRoomDepth = 4;
+
         public static void Execute()
         {
             var lines = Utilities.GetEmbeddedData("23").Lines().Select(x => x.Substring(1)).Skip(1).ToArray();
             var amphipods = 
                 Utilities.RangeFromTo(0, 10).Select(location => FromChar(location, 0, lines[0][location]))
                 .Concat(
-                    Enumerable.Range(1, 2).SelectMany(depth =>
+                    Utilities.RangeFromTo(1, MaxRoomDepth).SelectMany(depth =>
                         new[] { 2, 4, 6, 8 }.Select(location => FromChar(location, depth, lines[depth][location]))
                     )
                 )
@@ -154,6 +156,8 @@ namespace PageOfBob.Advent2021.App.Days
             Console.WriteLine($"#{hallway}#");
             Console.WriteLine($"###{state.PodCharAt(2, 1)}#{state.PodCharAt(4, 1)}#{state.PodCharAt(6, 1)}#{state.PodCharAt(8, 1)}###");
             Console.WriteLine($"###{state.PodCharAt(2, 2)}#{state.PodCharAt(4, 2)}#{state.PodCharAt(6, 2)}#{state.PodCharAt(8, 2)}###");
+            Console.WriteLine($"###{state.PodCharAt(2, 3)}#{state.PodCharAt(4, 3)}#{state.PodCharAt(6, 3)}#{state.PodCharAt(8, 3)}###");
+            Console.WriteLine($"###{state.PodCharAt(2, 4)}#{state.PodCharAt(4, 4)}#{state.PodCharAt(6, 4)}#{state.PodCharAt(8, 4)}###");
             Console.WriteLine("  #########");
             Console.WriteLine();
         }
@@ -198,7 +202,7 @@ namespace PageOfBob.Advent2021.App.Days
                 // Otherwise, calculate the cost.
                 var roomLocation = pod.DesiredRoomLocation();
                 var hallwayCost = Math.Abs(pod.Location - roomLocation) * pod.Cost();
-                var roomDepth = Utilities.RangeFromTo(1, 2).Last(l => !state.IsPodAt(roomLocation, l));
+                var roomDepth = Utilities.RangeFromTo(1, MaxRoomDepth).Last(l => !state.IsPodAt(roomLocation, l));
                 var roomCost = roomDepth * pod.Cost();
 
                 var costOfEnteringTheRoom = hallwayCost + roomCost;
@@ -226,6 +230,8 @@ namespace PageOfBob.Advent2021.App.Days
             {
                 state.PodAt(location, 1),
                 state.PodAt(location, 2),
+                state.PodAt(location, 3),
+                state.PodAt(location, 4),
             };
 
         public static bool CanPodExitRoom(this State state, Pod pod)
@@ -307,7 +313,7 @@ namespace PageOfBob.Advent2021.App.Days
             if (pod.Location != pod.DesiredRoomLocation())
                 return false;
 
-            var anyNonTypePods = Utilities.RangeFromTo(1, 2)
+            var anyNonTypePods = Utilities.RangeFromTo(1, MaxRoomDepth)
                 .Any(x =>
                 {
                     var p = state.PodAt(pod.Location, x);
@@ -328,7 +334,7 @@ namespace PageOfBob.Advent2021.App.Days
             {
                 var (type, location) = x;
 
-                return Utilities.RangeFromTo(1, 2).All(depth =>
+                return Utilities.RangeFromTo(1, MaxRoomDepth).All(depth =>
                 {
                     var pod = state.PodAt(location, depth);
                     return pod.HasValue && pod.Value.Type == type;
