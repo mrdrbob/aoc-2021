@@ -966,3 +966,14 @@ So, what I do is parse the input, detect each type of processor, and build a mod
 ## Day 24 - Part 2
 
 I just reversed the order of how I calculate the brute-force digits. It takes a little longer than part 1, but still fast enough to be acceptable.
+
+## Day 25 - Part 1
+
+I always wondered if day 25 would be the hardest, or if the AoC gods would have mercy on Christmas Eve. I feel like they had mercy. So for this one, I once again just stuffed all the data into a 1 dimensional array and wrote some helpers around accessing the data. For each step, I make an empty map, copy over the group that is stationary, then move (or not) the group that is moving. I made a few small tweaks to improve performance:
+
+1. I use a poor man's array pool. Rather than creating new arrays and then immediately throwing them away, I toss them into a stack when I'm done with them, and pop them off when I need a new one... In reality, the stack only ever has one item in it so I could have just swapped between a pair of arrays, but that was just more logic.
+2. Since I'm using a pool, I need to initialize the array. I could have to just looped through all the elements and set them to '.' manually, but instead I create an "empty" array, initialized to all '.' elements, and then copy that array into the array I want to zero out.
+
+Did these optimizations make a significant difference? No idea. I broke the golden rule of "performancing" and added tweaks without profiling. In any case, it arrives at the answer in a reasonable amount of time.
+
+And... I won't spoil part 2, except to say if you solved Part 1, I'm quite confident you can solve part 2.
