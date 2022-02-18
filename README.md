@@ -863,3 +863,106 @@ There was quite a bit to this one. Here are my key takeaways:
 Luckily, most of my algorithm wasn't too hard to adapt to additional room depth. Just changing a few instances of `2` to `MaxRoomDepth` and another couple minor adjustments, and the algorithm worked.
 
 I admit, though, that I just updated my input rather than inject two additional lines at runtime like I'm supposed'ta.
+
+## Day 24 - Part 1
+
+This is one of those I don't love. For me, it was all about analyzing the input, understanding what the input is doing, and then writing code that mostly ignores the input calculates results in its own way. It just feels like a hack, I guess? 
+
+By the way, I'm not too proud to admit that I had to read discussions around this one to finally see it.
+
+Anyway, if you carefully examine the input, you'll find it's a pattern that repeats 14 times, once for every digit. Each repeated pattern (which I've taken to calling a "processor") reads in the input and does mostly similar calculations on it. You may also notice that `w` is always used for storing the digit that's being processed (the input), `x` and `y` get reset for each processor, and `z` is the only value that carries over from one processor to the next.
+
+Next you'd want to examine one of the processors closely. Here's the first one from my input:
+
+```
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 14
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 1
+mul y x
+add z y
+```
+
+You can kind of step through the process and keep track of roughly what's happening. For example, the first few instructions:
+
+```
+[  0] inp w      | w = input
+[  1] mul x 0    | x = 0
+[  2] add x z    | x = z
+[  3] mod x 26   | x = z % 26
+[  4] div z 1    | z = z (effectively a no-op)
+[  5] add x 14   | x = (z % 26) + 14
+[  6] eql x w    | (z % 26) + 14 == input ? 1 : 0
+```
+
+At this point `(z % 26) + 14 == input ? 1 : 0`, it's important to remember that `input` is a number between 1 and 9 inclusive. `(z % 26)` is going to produce a number between 0 and 25, which is added to 14. There is no value for z which will result in that side of the equation producing a number less than 14. So it will never be true. So we can ignore all that math, and just write 0 there, and continue.
+
+```
+[  6] eql x w    | x = 0
+[  7] eql x 0    | x = 1
+[  8] mul y 0    | y = 0
+[  9] add y 25   | y = 25
+[ 10] mul y x    | y = 25 (x is 1, so this is a no-op)
+[ 11] add y 1    | y = 26 (another no-op)
+[ 12] mul z y    | z = 26 * z
+[ 13] mul y 0    | y = 0
+[ 14] add y w    | y = input
+[ 15] add y 1    | y = input + 1
+[ 16] mul y x    | y = input + 1 (x is 1, so this is a no-op)
+[ 17] add z y    | z = (26 * z) + (input + 1)
+```
+
+Since `z` is the only value that carries over, the formula for this unit is `z = (26 * z) + (input + 1)`. The second processor in my input is similar, except it works out to `z = (26 * z) + (input + 7)`. In total, there are 7 processors that follow this flow, which the value being added to `input` varying.
+
+There is another variation on this pattern that is a bit more complex. Here's an example from my input:
+
+```
+[  0] inp w      | w = input
+[  1] mul x 0    | x = 0
+[  2] add x z    | x = z
+[  3] mod x 26   | x = z % 26
+[  4] div z 26   | z = z / 26
+[  5] add x -6   | x = (z % 26) + -6
+[  6] eql x w    | x = ((z % 26) + -6) == input ? 1 : 0
+```
+
+Unlike in the previous processor, this conditional (`((z % 26) + -6) == input`) could potentially match something. In fact, we can calculate what input value could make this statement true for a given z value. But from here, we must branch into two possible values for x, shown separated by a colon below.
+
+```
+[  6] eql x w    | x = 1 : 0
+[  7] eql x 0    | x = 0 : 1
+[  8] mul y 0    | y = 0
+[  9] add y 25   | y = 25
+[ 10] mul y x    | y = 0 : 25
+[ 11] add y 1    | y = 1 : 26
+[ 12] mul z y    | z = (z / 26) : (z / 26) * 26
+[ 13] mul y 0    | y = 0
+[ 14] add y w    | y = input
+[ 15] add y 10   | y = input + 10
+[ 16] mul y x    | y = 0 : input + 10
+[ 17] add z y    | z = (z / 26) : ((z / 26) * 26) + (input + 10)
+```
+
+So depending on the state of z and digit fed to the processor, we either get `z / 26`, or `((z / 26) * 26) + (input + 10)`. Other processors in the input come a similar result:  `z / 26` or `((z / 26) * 26) + (input + 13)`, for example.
+
+But how does that get us closer to finding model numbers that work? Well, we know Z must reach zero by the end of the processing. We know that our first type of processors follow this equation: `z = (26 * z) + (input + A)` where `A` appears to always be a positive number. This will only ever increase Z by a factor of roughly 26, and will happen seven times.
+
+We need Z to be zero, so we must also decrease Z by a factor of roughly 26. `z / 26` accomplishes this, but `((z / 26) * 26) + (input + B)`, where `B` always appears to be a positive number, does not. So we need the second processor to always chose the `z / 26` path, and because we know the conditions to chose that path (`((z % 26) + C) == input`, where `C` appears to always be negative), we calculate the input digit to cause that to happen.
+
+So, what I do is parse the input, detect each type of processor, and build a model around that. Then I iterate through all the processors. For the "simple" processors, I just brute-force the input digits. For the "complex" processors, I calculate which (if any) input digit would produce the valid path. This reduces my problem space from 9^14, to 9^7, making it solvable in a reasonable amount of time.
+
+## Day 24 - Part 2
+
+I just reversed the order of how I calculate the brute-force digits. It takes a little longer than part 1, but still fast enough to be acceptable.
